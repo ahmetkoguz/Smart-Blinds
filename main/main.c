@@ -1,214 +1,274 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h> 
+#include "connect.h"
+#include "nvs_flash.h"
+#include "esp_log.h"
+#include "esp_http_server.h"
+#include "mdns.h"
+#include "routes/_routes.h"
+#include "cJSON.h"
+#include "esp_spiffs.h"
+#include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "esp_system.h"
-#include "esp_spi_flash.h"
-#include <esp_http_server.h>
-#include "nvs_flash.h"
-#include "esp_spiffs.h"
 
-#include "connect_wifi.h"
-#include "esp_rom_gpio.h"
+static const char *SSID = "Ahmet Kerim iPone";
+static const char *PASS = "password";
 
-#define LED_PIN 23
-httpd_handle_t server = NULL;
-struct async_resp_arg {
-    httpd_handle_t hd;
-    int fd;
-};
+static const char *TAG = "SERVER";
+#define MAX_APs 20
 
-static const char *TAG = "WebSocket Server"; // TAG for debug
-int led_state = 0;
+static httpd_handle_t server = NULL;
 
-#define INDEX_HTML_PATH "/spiffs/index.html"
-char index_html[4096];
-char response_data[4096];
-
-static void initi_web_page_buffer(void)
+static esp_err_t on_default_url(httpd_req_t *req)
 {
-    esp_vfs_spiffs_conf_t conf = {
-        .base_path = "/spiffs",
-        .partition_label = NULL,
-        .max_files = 5,
-        .format_if_mount_failed = true};
+  ESP_LOGI(TAG, "Opening page for URL: %s", req->uri);
 
-    ESP_ERROR_CHECK(esp_vfs_spiffs_register(&conf));
+  esp_vfs_spiffs_conf_t esp_vfs_spiffs_conf = {
+      .base_path = "/spiffs",
+      .partition_label = NULL,
+      .max_files = 5,
+      .format_if_mount_failed = true};
+  esp_vfs_spiffs_register(&esp_vfs_spiffs_conf);
 
-    memset((void *)index_html, 0, sizeof(index_html));
-    struct stat st;
-    if (stat(INDEX_HTML_PATH, &st))
-    {
-        ESP_LOGE(TAG, "index.html not found");
-        return;
-    }
-
-    FILE *fp = fopen(INDEX_HTML_PATH, "r");
-    if (fread(index_html, st.st_size, 1, fp) == 0)
-    {
-        ESP_LOGE(TAG, "fread failed");
-    }
-    fclose(fp);
-}
-
-esp_err_t get_req_handler(httpd_req_t *req)
-{
-    int response;
-    if(led_state)
-    {
-        sprintf(response_data, index_html, "ON");
-    }
-    else
-    {
-        sprintf(response_data, index_html, "OFF");
-    }
-    response = httpd_resp_send(req, response_data, HTTPD_RESP_USE_STRLEN);
-    return response;
-}
-
-static void ws_async_send(void *arg)
-{
-    httpd_ws_frame_t ws_pkt;
-    struct async_resp_arg *resp_arg = arg;
-    httpd_handle_t hd = resp_arg->hd;
-    int fd = resp_arg->fd;
-
-    led_state = !led_state;
-    gpio_set_level(LED_PIN, led_state);
-    
-    char buff[4];
-    memset(buff, 0, sizeof(buff));
-    sprintf(buff, "%d",led_state);
-    
-    memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
-    ws_pkt.payload = (uint8_t *)buff;
-    ws_pkt.len = strlen(buff);
-    ws_pkt.type = HTTPD_WS_TYPE_TEXT;
-    
-    static size_t max_clients = CONFIG_LWIP_MAX_LISTENING_TCP;
-    size_t fds = max_clients;
-    int client_fds[max_clients];
-
-    esp_err_t ret = httpd_get_client_list(server, &fds, client_fds);
-
-    if (ret != ESP_OK) {
-        return;
-    }
-
-    for (int i = 0; i < fds; i++) {
-        int client_info = httpd_ws_get_fd_info(server, client_fds[i]);
-        if (client_info == HTTPD_WS_CLIENT_WEBSOCKET) {
-            httpd_ws_send_frame_async(hd, client_fds[i], &ws_pkt);
-        }
-    }
-    free(resp_arg);
-}
-
-static esp_err_t trigger_async_send(httpd_handle_t handle, httpd_req_t *req)
-{
-    struct async_resp_arg *resp_arg = malloc(sizeof(struct async_resp_arg));
-    resp_arg->hd = req->handle;
-    resp_arg->fd = httpd_req_to_sockfd(req);
-    return httpd_queue_work(handle, ws_async_send, resp_arg);
-}
-
-static esp_err_t handle_ws_req(httpd_req_t *req)
-{
-    if (req->method == HTTP_GET)
-    {
-        ESP_LOGI(TAG, "Handshake done, the new connection was opened");
-        return ESP_OK;
-    }
-
-    httpd_ws_frame_t ws_pkt;
-    uint8_t *buf = NULL;
-    memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
-    ws_pkt.type = HTTPD_WS_TYPE_TEXT;
-    esp_err_t ret = httpd_ws_recv_frame(req, &ws_pkt, 0);
-    if (ret != ESP_OK)
-    {
-        ESP_LOGE(TAG, "httpd_ws_recv_frame failed to get frame len with %d", ret);
-        return ret;
-    }
-
-    if (ws_pkt.len)
-    {
-        buf = calloc(1, ws_pkt.len + 1);
-        if (buf == NULL)
-        {
-            ESP_LOGE(TAG, "Failed to calloc memory for buf");
-            return ESP_ERR_NO_MEM;
-        }
-        ws_pkt.payload = buf;
-        ret = httpd_ws_recv_frame(req, &ws_pkt, ws_pkt.len);
-        if (ret != ESP_OK)
-        {
-            ESP_LOGE(TAG, "httpd_ws_recv_frame failed with %d", ret);
-            free(buf);
-            return ret;
-        }
-        ESP_LOGI(TAG, "Got packet with message: %s", ws_pkt.payload);
-    }
-
-    ESP_LOGI(TAG, "frame len is %d", ws_pkt.len);
-
-    if (ws_pkt.type == HTTPD_WS_TYPE_TEXT &&
-        strcmp((char *)ws_pkt.payload, "toggle") == 0)
-    {
-        free(buf);
-        return trigger_async_send(req->handle, req);
-    }
+  char path[600];
+  if (strcmp(req->uri, "/") == 0)
+    strcpy(path, "/spiffs/index.html");
+  else
+    sprintf(path, "/spiffs%s", req->uri);
+  char *ext = strrchr(path, '.');
+  if (ext == NULL || strncmp(ext, ".local", strlen(".local")) == 0)
+  {
+    httpd_resp_set_status(req, "301 Moved Permanently");
+    httpd_resp_set_hdr(req, "Location", "/");
+    httpd_resp_send(req, NULL, 0);
     return ESP_OK;
+  }
+  if (strcmp(ext, ".css") == 0)
+    httpd_resp_set_type(req, "text/css");
+  if (strcmp(ext, ".js") == 0)
+    httpd_resp_set_type(req, "text/javascript");
+  if (strcmp(ext, ".png") == 0)
+    httpd_resp_set_type(req, "image/png");
+
+  FILE *file = fopen(path, "r");
+  if (file == NULL)
+  {
+    httpd_resp_send_404(req);
+    esp_vfs_spiffs_unregister(NULL);
+    return ESP_OK;
+  }
+
+  char lineRead[256];
+  while (fgets(lineRead, sizeof(lineRead), file))
+  {
+    httpd_resp_sendstr_chunk(req, lineRead);
+  }
+  httpd_resp_sendstr_chunk(req, NULL);
+
+  esp_vfs_spiffs_unregister(NULL);
+  return ESP_OK;
 }
 
-httpd_handle_t setup_websocket_server(void)
+static esp_err_t on_get_ap_list(httpd_req_t *req)
 {
-    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+  wifi_scan_config_t scan_config = {
+      .ssid = 0,
+      .bssid = 0,
+      .channel = 0,
+      .show_hidden = true};
 
-    httpd_uri_t uri_get = {
-        .uri = "/",
-        .method = HTTP_GET,
-        .handler = get_req_handler,
-        .user_ctx = NULL};
+  esp_wifi_set_mode(WIFI_MODE_APSTA);
+  ESP_ERROR_CHECK(esp_wifi_scan_start(&scan_config, true));
 
-    httpd_uri_t ws = {
-        .uri = "/ws",
-        .method = HTTP_GET,
-        .handler = handle_ws_req,
-        .user_ctx = NULL,
-        .is_websocket = true};
+  wifi_ap_record_t wifi_records[MAX_APs];
 
-    if (httpd_start(&server, &config) == ESP_OK)
-    {
-        httpd_register_uri_handler(server, &uri_get);
-        httpd_register_uri_handler(server, &ws);
-    }
-
-    return server;
+  uint16_t maxRecods = MAX_APs;
+  ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&maxRecods, wifi_records));
+  cJSON *wifi_scan_json = cJSON_CreateArray();
+  for (size_t i = 0; i < maxRecods; i++)
+  {
+    cJSON *entry = cJSON_CreateObject();
+    cJSON_AddStringToObject(entry, "ssid", (char *)wifi_records[i].ssid);
+    cJSON_AddNumberToObject(entry, "rssi", wifi_records[i].rssi);
+    cJSON_AddItemToArray(wifi_scan_json, entry);
+  }
+  char *json_string = cJSON_Print(wifi_scan_json);
+  httpd_resp_set_type(req, "application/json");
+  httpd_resp_send(req, json_string, strlen(json_string));
+  cJSON_Delete(wifi_scan_json);
+  free(json_string);
+  return ESP_OK;
 }
 
-void app_main()
+/**************** AP TO STA ********************/
+typedef struct ap_config_t
 {
-    // Initialize NVS
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
-    {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
+  char ssid[32];
+  char password[64];
+} ap_config_t;
 
-    connect_wifi();
+static void connect_to_ap(void *params)
+{
+  wifi_disconnect();
+  wifi_destroy_netif();
 
-    if (wifi_connect_status)
-    {
-        esp_rom_gpio_pad_select_gpio(LED_PIN);
-        gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
+  ap_config_t *ap_config = (ap_config_t *)params;
 
-        led_state = 0;
-        ESP_LOGI(TAG, "ESP32 ESP-IDF WebSocket Web Server is running ... ...\n");
-        initi_web_page_buffer();
-        setup_websocket_server();
-    }
+  ESP_LOGI(TAG, "Connecting to AP %s %s", ap_config->ssid, ap_config->password);
+  if (wifi_connect_sta(ap_config->ssid, ap_config->password, 10000) != ESP_OK)
+  {
+    ESP_LOGE(TAG, "Failed to connect to AP");
+    wifi_connect_ap("esp32ap", "password");
+  }
+  else
+  {
+    ESP_LOGI(TAG, "Connected to AP");
+  }
+  vTaskDelete(NULL);
+}
+
+static esp_err_t on_ap_to_sta(httpd_req_t *req)
+{
+
+  char buffer[100];
+  static ap_config_t ap_config;
+
+  memset(&buffer, 0, sizeof(buffer));
+  httpd_req_recv(req, buffer, req->content_len);
+
+  cJSON *payload = cJSON_Parse(buffer);
+  strcpy(ap_config.ssid, cJSON_GetObjectItem(payload, "ssid")->valuestring);
+  strcpy(ap_config.password, cJSON_GetObjectItem(payload, "password")->valuestring);
+  cJSON_Delete(payload);
+
+  xTaskCreate(connect_to_ap, "connect_to_ap", 1024 * 5, &ap_config, 1, NULL);
+  return ESP_OK;
+}
+
+/********************Web Socket *******************/
+
+static int client_session_id;
+
+esp_err_t send_ws_message(char *message)
+{
+  if (!client_session_id)
+  {
+    ESP_LOGE(TAG, "no client_session_id");
+    return -1;
+  }
+  return send_ws_message_to_clinet(message, client_session_id);
+}
+
+esp_err_t send_ws_message_to_clinet(char *message, int clinet_id)
+{
+  if (!clinet_id)
+  {
+    ESP_LOGE(TAG, "no client_session_id");
+    return -1;
+  }
+  httpd_ws_frame_t ws_message = {
+      .final = true,
+      .fragmented = false,
+      .len = strlen(message),
+      .payload = (uint8_t *)message,
+      .type = HTTPD_WS_TYPE_TEXT};
+  return httpd_ws_send_frame_async(server, clinet_id, &ws_message);
+}
+
+/*******************************************/
+
+static void init_server()
+{
+
+  httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+  config.uri_match_fn = httpd_uri_match_wildcard;
+
+  ESP_ERROR_CHECK(httpd_start(&server, &config));
+
+  httpd_uri_t get_hello_world = {
+      .uri = "/api/hello-world",
+      .method = HTTP_GET,
+      .handler = on_hello_world};
+  httpd_register_uri_handler(server, &get_hello_world);
+
+  httpd_uri_t get_ap_list_url = {
+      .uri = "/api/get-ap-list",
+      .method = HTTP_GET,
+      .handler = on_get_ap_list};
+  httpd_register_uri_handler(server, &get_ap_list_url);
+
+  httpd_uri_t toggle_led_url = {
+      .uri = "/api/toggle-led",
+      .method = HTTP_POST,
+      .handler = on_toggle_led_url};
+  httpd_register_uri_handler(server, &toggle_led_url);
+
+  httpd_uri_t ap_to_sta_url = {
+      .uri = "/api/ap-sta",
+      .method = HTTP_POST,
+      .handler = on_ap_to_sta};
+  httpd_register_uri_handler(server, &ap_to_sta_url);
+
+  httpd_uri_t web_magnetometer_url = {
+      .uri = "/ws-api/magnetometer",
+      .method = HTTP_GET,
+      .handler = on_magnetometer,
+      .is_websocket = true};
+  httpd_register_uri_handler(server, &web_magnetometer_url);
+
+  httpd_uri_t servo_url = {
+      .uri = "/ws-api/servo",
+      .method = HTTP_GET,
+      .handler = on_servo_url,
+      .is_websocket = true};
+  httpd_register_uri_handler(server, &servo_url);
+
+  httpd_uri_t btn_push_url = {
+      .uri = "/ws-api/btn-push",
+      .method = HTTP_GET,
+      .handler = on_web_socket_btn_push_url,
+      .is_websocket = true};
+  httpd_register_uri_handler(server, &btn_push_url);
+
+  httpd_uri_t default_url = {
+      .uri = "/*",
+      .method = HTTP_GET,
+      .handler = on_default_url};
+  httpd_register_uri_handler(server, &default_url);
+}
+
+void start_mdns_service()
+{
+  mdns_init();
+  mdns_hostname_set("my-esp32");
+  mdns_instance_name_set("LEARN esp32 thing");
+}
+
+void app_main(void)
+{
+  ESP_ERROR_CHECK(nvs_flash_init());
+
+  esp_vfs_spiffs_conf_t esp_vfs_spiffs_conf = {
+      .base_path = "/spiffs",
+      .partition_label = NULL,
+      .max_files = 5,
+      .format_if_mount_failed = true};
+  esp_vfs_spiffs_register(&esp_vfs_spiffs_conf);
+
+  size_t total = 0;
+  size_t used = 0;
+  esp_spiffs_info(NULL, &total, &used);
+
+  ESP_LOGI("SPIFFS", "total %d, used %d", total, used);
+  esp_vfs_spiffs_unregister(NULL);
+
+  init_led();
+  init_btn();
+  init_servo();
+  wifi_init();
+  ESP_ERROR_CHECK(wifi_connect_sta(SSID, PASS, 10000));
+  // wifi_connect_ap("esp32ap", "password");
+
+  start_mdns_service();
+  init_server();
 }

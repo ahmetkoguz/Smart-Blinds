@@ -1,6 +1,14 @@
-set(srcs "main.c"
-	     "connect_wifi.c")
-idf_component_register(SRCS ${srcs}
-                    INCLUDE_DIRS ".")
+idf_component_register(
+  SRCS 
+    "routes/pushBtn.c"
+    "routes/toggleLed.c"
+    "routes/helloWorld.c"
+    "routes/magnetometer.c"
+    "routes/servo.c"
+    "main.c"
+  INCLUDE_DIRS 
+    "."
+    "routes"
+  )
 
-spiffs_create_partition_image(storage ../data FLASH_IN_PROJECT)
+spiffs_create_partition_image(spiffs ../site/dist FLASH_IN_PROJECT)                    
