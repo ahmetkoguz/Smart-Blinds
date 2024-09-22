@@ -1,7 +1,7 @@
 #include "_routes.h"
 #include "driver/gpio.h"
 
-#define LED 2
+#define LED 23
 
 void init_led(void)
 {
