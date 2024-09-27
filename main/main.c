@@ -181,6 +181,7 @@ static void init_server()
 {
 
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+  config.max_uri_handlers = 15; // if not enough handlers, up
   config.uri_match_fn = httpd_uri_match_wildcard;
 
   ESP_ERROR_CHECK(httpd_start(&server, &config));
@@ -197,11 +198,23 @@ static void init_server()
       .handler = on_get_ap_list};
   httpd_register_uri_handler(server, &get_ap_list_url);
 
-  httpd_uri_t toggle_led_url = {
-      .uri = "/api/toggle-led",
+  httpd_uri_t raise_url = {
+      .uri = "/api/raise",
       .method = HTTP_POST,
-      .handler = on_toggle_led_url};
-  httpd_register_uri_handler(server, &toggle_led_url);
+      .handler = on_raise};
+  httpd_register_uri_handler(server, &raise_url);
+
+  httpd_uri_t lower_url = {
+      .uri = "/api/lower",
+      .method = HTTP_POST,
+      .handler = on_lower};
+  httpd_register_uri_handler(server, &lower_url);
+
+  httpd_uri_t stop_url = {
+      .uri = "/api/stop",
+      .method = HTTP_POST,
+      .handler = on_stop};
+  httpd_register_uri_handler(server, &stop_url);
 
   httpd_uri_t ap_to_sta_url = {
       .uri = "/api/ap-sta",
@@ -262,9 +275,11 @@ void app_main(void)
   ESP_LOGI("SPIFFS", "total %d, used %d", total, used);
   esp_vfs_spiffs_unregister(NULL);
 
-  init_led();
-  init_btn();
-  init_servo();
+  init_lower();
+  init_stop();
+  init_raise();
+  // init_btn();
+  // init_servo();
   wifi_init();
   ESP_ERROR_CHECK(wifi_connect_sta(SSID, PASS, 10000));
   // wifi_connect_ap("esp32ap", "password");

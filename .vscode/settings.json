@@ -8,7 +8,8 @@
     "*.ipp": "c",
     "istream": "c",
     "*.tcc": "c",
-    "_routes.h": "c"
+    "_routes.h": "c",
+    "esp_spiffs.h": "c"
   },
   "idf.openOcdConfigs": [
     "board/esp32-wrover-kit-3.3v.cfg"

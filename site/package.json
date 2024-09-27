@@ -11,6 +11,7 @@
     "@babel/helper-builder-react-jsx": "latest",
     "@emotion/react": "latest",
     "@emotion/styled": "latest",
+    "@mui/icons-material": "^6.1.1",
     "@mui/material": "latest",
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",

@@ -1,10 +1,12 @@
 idf_component_register(
   SRCS 
     "routes/pushBtn.c"
-    "routes/toggleLed.c"
     "routes/helloWorld.c"
     "routes/magnetometer.c"
     "routes/servo.c"
+    "routes/raise.c"
+    "routes/lower.c"
+    "routes/stop.c"
     "main.c"
   INCLUDE_DIRS 
     "."
