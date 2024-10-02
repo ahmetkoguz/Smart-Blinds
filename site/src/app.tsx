@@ -7,6 +7,7 @@ import { Route } from "wouter";
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { SaveSchedule } from "./views/saveSchedule";
+import { Lock } from "@mui/icons-material";
 
 export const App = () => {
   const [isActive, setIsActive] = useState(false);
@@ -73,12 +74,15 @@ export const App = () => {
 
   return (
     <Route path="/">
-      <Container>
+      <Container sx={{ width: '600px' }}>
         <PinDialog />
-          <Grid2 container rowSpacing='65px' sx={{ display: 'flex', flexDirection: 'column', alignContent: 'center' }}>
+          <Grid2 container rowSpacing='50px' sx={{ display: 'flex', flexDirection: 'column', alignContent: 'center' }}>
+            {/* Title */}
             <Grid2 size={12} display='flex' justifyContent='center'>
               <Typography color='primary' fontSize='3rem' variant='h2'>Smart Blinds</Typography>
             </Grid2>
+
+            {/* Status */}
             <Grid2>
               <Grid2 size={4} display='flex' pb='22px'>
                 <Typography color='textPrimary' variant='h4'>Current Status</Typography>
@@ -90,8 +94,12 @@ export const App = () => {
               <Grid2 size={4} display='flex' justifyContent='center' pt={3}>
                 <Stop isActive={isActive} handleActive={setIsActive} resetSignals={resetSignals}/>
               </Grid2>
-              <Grid2 size={4} display='flex' justifyContent='center' pt={3}>
-                <Button onClick={handleOpen}>Lock Blinds</Button>
+            </Grid2>
+
+            {/* Schedule */}
+            <Grid2>
+              <Grid2 size={4} display='flex'>
+                <Typography color='textPrimary' variant='h4'>Current Schedule</Typography>
               </Grid2>
               <Grid2 size={4} display='flex' justifyContent='center' pt={3}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -101,6 +109,16 @@ export const App = () => {
                   />
                   <SaveSchedule date={date} />
                 </LocalizationProvider>
+              </Grid2>
+              <Grid2 size={4} display='flex' justifyContent='center' pt={3}>
+                <Button 
+                  variant='contained' 
+                  startIcon={<Lock />} 
+                  onClick={handleOpen}
+                  fullWidth
+                >
+                  Lock Blinds
+                </Button>
               </Grid2>
             </Grid2>
           </Grid2>
