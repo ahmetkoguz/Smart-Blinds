@@ -1,14 +1,6 @@
 import { ArrowUpward } from "@mui/icons-material";
-import { Button, createTheme, styled, Typography } from "@mui/material";
+import { Button, createTheme, Typography } from "@mui/material";
 import { useState } from "preact/hooks";
-
-const StyledButton = styled(Button)(({ theme }) => ({
-// const StyledButton = styled(Button)(({ isOn, theme }) => ({
-  color: theme.palette.grey[700],
-  '&:disabled': {
-    // color: isOn ? theme.palette.warning.main: 'disabled',
-  },
-}));
 
 export const Raise = ({ isActive, handleActive }) => {
   const [isOn, setIsOn] = useState(false);
@@ -28,17 +20,15 @@ export const Raise = ({ isActive, handleActive }) => {
   const theme = createTheme();
 
   return (
-    <StyledButton 
-      // isOn={isOn}
-      theme={theme}
+    <Button 
       disabled={isActive}
       onClick={onClick} 
       sx={{
-        padding: 1, display: 'flex', flexDirection: 'column', rowGap: '10px', width: '75px'
+        color: theme.palette.grey[700],padding: 1, display: 'flex', flexDirection: 'column', rowGap: '10px', width: '75px', '&:disabled': {color: isOn ? theme.palette.warning.main: 'disabled',},
       }}
     >
       <ArrowUpward></ArrowUpward>
       <Typography variant='body2' color='textSecondary'>RAISE</Typography>
-    </StyledButton>
+    </Button>
   )
 };

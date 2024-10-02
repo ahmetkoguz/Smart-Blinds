@@ -66,7 +66,7 @@ export const App = () => {
         <PinDialog />
           <Grid2 container rowSpacing='65px' sx={{ display: 'flex', flexDirection: 'column', alignContent: 'center' }}>
             <Grid2 size={12} display='flex' justifyContent='center'>
-              <Typography color='primary' fontSize='3.25rem' variant='h2'>Smart Blinds</Typography>
+              <Typography color='primary' fontSize='3rem' variant='h2'>Smart Blinds</Typography>
             </Grid2>
             <Grid2>
               <Grid2 size={4} display='flex' pb='22px'>
