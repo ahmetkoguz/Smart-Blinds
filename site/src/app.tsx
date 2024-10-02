@@ -1,10 +1,10 @@
-import { Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid2, TextField, Typography } from "@mui/material";
+import { Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid2, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { Lower } from "./views/lower";
 import { Raise } from "./views/raise";
 import { Stop } from "./views/stop";
 import { useState } from "preact/hooks";
 import { Route } from "wouter";
-import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { ArrowDropDownIcon, DateTimePicker, LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { SaveSchedule } from "./views/saveSchedule";
 import { Lock } from "@mui/icons-material";
@@ -72,6 +72,16 @@ export const App = () => {
     setRaise(false);
   }
 
+  const [formats, setFormats] = useState(() => ['bold', 'italic']);
+
+  const handleFormat = (
+    event: React.MouseEvent<HTMLElement>,
+    newFormats: string[],
+  ) => {
+    setFormats(newFormats);
+  };
+
+
   return (
     <Route path="/">
       <Container sx={{ width: '600px' }}>
@@ -107,6 +117,30 @@ export const App = () => {
                     value={date}
                     onChange={(newValue) => setDate(newValue)}
                   />
+                  <TimePicker
+                    // label='Raise'
+                    // name='Raise'
+                    // value={date}
+                    // onChange={(newValue) => setDate(newValue)}
+                  />
+                  <ToggleButtonGroup
+                    value={formats}
+                    onChange={handleFormat}
+                    aria-label="text formatting"
+                  >
+                    <ToggleButton value="bold" aria-label="bold">
+                      <Lock />
+                    </ToggleButton>
+                    <ToggleButton value="italic" aria-label="italic">
+                      <Lock />
+                    </ToggleButton>
+                    <ToggleButton value="underlined" aria-label="underlined">
+                      <Lock />
+                    </ToggleButton>
+                    <ToggleButton value="color" aria-label="color" disabled>
+                      <ArrowDropDownIcon />
+                    </ToggleButton>
+                  </ToggleButtonGroup>
                   <SaveSchedule date={date} />
                 </LocalizationProvider>
               </Grid2>
