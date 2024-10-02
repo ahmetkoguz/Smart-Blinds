@@ -1,36 +1,14 @@
-import { ArrowUpward, Cancel, CancelOutlined } from "@mui/icons-material";
-import { Button, createTheme, styled, Typography } from "@mui/material";
-import { useState } from "preact/hooks";
+import { Cancel } from "@mui/icons-material";
+import { Button } from "@mui/material";
 
-const StyledButton = styled(Button)(({ theme }) => ({
-// const StyledButton = styled(Button)(({ isOn, theme }) => ({
-  color: theme.palette.error.main,
-  '&:disabled': {
-    // color: isOn ? theme.palette.warning.main: 'disabled',
-  },
-}));
-
-export const Stop = ({ isActive, handleActive }) => {
-  const [isOn, setIsOn] = useState(false);
-
+export const Stop = ({ isActive, handleActive, resetSignals }) => {
   const onClick = async () => {
     handleActive(false)
-    setIsOn(true);
-    await fetch("/api/stop", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ isOn }),
-    });
+    resetSignals();
   };
 
-  const theme = createTheme();
-
   return (
-    <StyledButton 
-      // isOn={isOn}
-      theme={theme}
+    <Button 
       disabled={!isActive}
       onClick={onClick} 
       variant='outlined'
@@ -39,6 +17,6 @@ export const Stop = ({ isActive, handleActive }) => {
       fullWidth
     >
         STOP
-    </StyledButton>
+    </Button>
   )
 };

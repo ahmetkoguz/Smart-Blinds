@@ -1,19 +1,16 @@
 import { ArrowDownward } from "@mui/icons-material";
 import { Button, createTheme, Typography } from "@mui/material";
-import { useState } from "preact/hooks";
 
-export const Lower = ({ isActive, handleActive }) => {
-  const [isOn, setIsOn] = useState(false);
-
+export const Lower = ({ isActive, handleActive, lower, setLower }) => {
   const onClick = async () => {
     handleActive(true);
-    setIsOn(true);
+    setLower(true);
     await fetch("/api/lower", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ isOn }),
+      body: JSON.stringify({ lower }),
     });
   };
 
@@ -24,7 +21,7 @@ export const Lower = ({ isActive, handleActive }) => {
       disabled={isActive}
       onClick={onClick} 
       sx={{
-        color: theme.palette.grey[700],padding: 1, display: 'flex', flexDirection: 'column', rowGap: '10px', width: '75px', '&:disabled': {color: isOn ? theme.palette.warning.main: 'disabled',},
+        color: theme.palette.grey[700],padding: 1, display: 'flex', flexDirection: 'column', rowGap: '10px', width: '75px', '&:disabled': {color: lower ? theme.palette.warning.main: 'disabled',},
       }}
     >
       <ArrowDownward></ArrowDownward>

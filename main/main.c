@@ -216,6 +216,12 @@ static void init_server()
       .handler = on_stop};
   httpd_register_uri_handler(server, &stop_url);
 
+  httpd_uri_t set_schedule_url = {
+      .uri = "/api/setSchedule",
+      .method = HTTP_POST,
+      .handler = on_set_schedule};
+  httpd_register_uri_handler(server, &set_schedule_url);
+
   httpd_uri_t ap_to_sta_url = {
       .uri = "/api/ap-sta",
       .method = HTTP_POST,

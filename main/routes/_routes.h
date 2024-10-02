@@ -20,6 +20,7 @@ void init_raise(void);
 esp_err_t on_raise(httpd_req_t *req);
 esp_err_t on_lower(httpd_req_t *req);
 esp_err_t on_stop(httpd_req_t *req);
+esp_err_t on_set_schedule(httpd_req_t *req);
 esp_err_t on_hello_world(httpd_req_t *req);
 esp_err_t on_magnetometer(httpd_req_t *req);
 esp_err_t on_web_socket_btn_push_url(httpd_req_t *req);
