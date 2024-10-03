@@ -5,12 +5,13 @@ export const Lower = ({ isActive, handleActive, lower, setLower }) => {
   const onClick = async () => {
     handleActive(true);
     setLower(true);
+    let is_on = true;
     await fetch("/api/lower", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ lower }),
+      body: JSON.stringify({ is_on }),
     });
   };
 

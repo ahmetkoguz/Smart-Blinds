@@ -11,8 +11,7 @@ void init_raise(void)
 
 void toggle_raise(bool is_on)
 {
-  // gpio_set_level(RAISE_PIN, is_on);
-  gpio_set_level(RAISE_PIN, true);
+  gpio_set_level(RAISE_PIN, is_on);
 }
 
 esp_err_t on_raise(httpd_req_t *req)

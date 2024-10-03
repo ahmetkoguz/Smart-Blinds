@@ -11,8 +11,7 @@ void init_lower(void)
 
 void toggle_lower(bool is_on)
 {
-  // gpio_set_level(LOWER_PIN, is_on);
-  gpio_set_level(LOWER_PIN, true);
+  gpio_set_level(LOWER_PIN, is_on);
 }
 
 esp_err_t on_lower(httpd_req_t *req)

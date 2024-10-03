@@ -84,7 +84,7 @@ export const App = () => {
 
   return (
     <Route path="/">
-      <Container sx={{ width: '600px' }}>
+      <Container maxWidth='sm'>
         <PinDialog />
           <Grid2 container rowSpacing='50px' sx={{ display: 'flex', flexDirection: 'column', alignContent: 'center' }}>
             {/* Title */}
