@@ -4,7 +4,7 @@ import { Raise } from "./views/raise";
 import { Stop } from "./views/stop";
 import { useState } from "preact/hooks";
 import { Route } from "wouter";
-import { ArrowDropDownIcon, DateTimePicker, LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
+import { DateTimePicker, LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { SaveSchedule } from "./views/saveSchedule";
 import { Lock } from "@mui/icons-material";
@@ -72,7 +72,7 @@ export const App = () => {
     setRaise(false);
   }
 
-  const [formats, setFormats] = useState(() => ['bold', 'italic']);
+  const [formats, setFormats] = useState(() => []);
 
   const handleFormat = (
     event: React.MouseEvent<HTMLElement>,
@@ -111,38 +111,45 @@ export const App = () => {
               <Grid2 size={4} display='flex'>
                 <Typography color='textPrimary' variant='h4'>Current Schedule</Typography>
               </Grid2>
-              <Grid2 size={4} display='flex' justifyContent='center' pt={3}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateTimePicker
-                    value={date}
-                    onChange={(newValue) => setDate(newValue)}
-                  />
-                  <TimePicker
-                    // label='Raise'
-                    // name='Raise'
-                    // value={date}
-                    // onChange={(newValue) => setDate(newValue)}
-                  />
+              <Grid2 size={4} display='flex' justifyContent='center' pt={3} flexDirection='column' alignItems='center' rowGap={4}>
+                <Grid2>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DateTimePicker
+                      value={date}
+                      onChange={(newValue) => setDate(newValue)}
+                    />
+                    <TimePicker
+                      // label='Raise'
+                      // name='Raise'
+                      // value={date}
+                      // onChange={(newValue) => setDate(newValue)}
+                    />
+                  </LocalizationProvider>
+                </Grid2>
+                <Grid2>
                   <ToggleButtonGroup
                     value={formats}
                     onChange={handleFormat}
+                    color="primary"
                     aria-label="text formatting"
                   >
-                    <ToggleButton value="bold" aria-label="bold">
-                      <Lock />
+                    <ToggleButton value="Monday" aria-label="Monday">
+                      M
                     </ToggleButton>
                     <ToggleButton value="italic" aria-label="italic">
-                      <Lock />
+                      T
                     </ToggleButton>
                     <ToggleButton value="underlined" aria-label="underlined">
-                      <Lock />
+                      W
                     </ToggleButton>
-                    <ToggleButton value="color" aria-label="color" disabled>
-                      <ArrowDropDownIcon />
+                    <ToggleButton value="color" aria-label="color">
+                      TH
                     </ToggleButton>
                   </ToggleButtonGroup>
-                  <SaveSchedule date={date} />
-                </LocalizationProvider>
+                </Grid2>
+                <Grid2>
+                    <SaveSchedule date={date} />
+                </Grid2>
               </Grid2>
               <Grid2 size={4} display='flex' justifyContent='center' pt={3}>
                 <Button 
