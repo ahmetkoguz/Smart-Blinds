@@ -15,7 +15,7 @@ export const App = () => {
   const [lower, setLower] = useState(false);
   const [date, setDate] = useState();
 
-  const [pin, setPIN] = useState();
+  const [pin, setPIN] = useState(1234); // test harcoded pin for demo
   const [pinDialogOpen, setPinDialogOpen] = useState(true);
 
   const handleOpen = () => {
@@ -43,7 +43,7 @@ export const App = () => {
   
   const PinDialog = () => {
     return (
-    <Dialog open={pinDialogOpen} slotProps={{ backdrop: { style: { backgroundColor: "white" } } }} >
+    <Dialog open={pinDialogOpen} disableRestoreFocus slotProps={{ backdrop: { style: { backgroundColor: "white" } } }} >
       <DialogTitle>Enter PIN</DialogTitle><DialogContent>
       <DialogContentText>
         To gain access to Smart Blinds enter your PIN.
@@ -59,7 +59,7 @@ export const App = () => {
         type="password"
         fullWidth
         variant="standard" 
-        inputProps={{ maxLength: 4 }}
+        inputProps={{ maxLength: 4, inputMode: 'numeric' }}
       />
         </DialogContent><DialogActions>
       </DialogActions>

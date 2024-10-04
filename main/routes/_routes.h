@@ -15,6 +15,8 @@ void init_servo(void);
 void init_lower(void);
 void init_stop(void);
 void init_raise(void);
+void adc_init_lower(void);
+void adc_init_raise(void);
 
 /******************** http callbacks ****************/
 esp_err_t on_raise(httpd_req_t *req);
