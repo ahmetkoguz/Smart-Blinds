@@ -72,13 +72,14 @@ export const App = () => {
     setRaise(false);
   }
 
-  const [formats, setFormats] = useState(() => []);
+  const [weekdays, setWeekdays] = useState(() => []);
 
-  const handleFormat = (
+  const handleWeekdays = (
     event: React.MouseEvent<HTMLElement>,
     newFormats: string[],
   ) => {
-    setFormats(newFormats);
+    setWeekdays(newFormats);
+    console.log(newFormats);
   };
 
 
@@ -128,22 +129,32 @@ export const App = () => {
                 </Grid2>
                 <Grid2>
                   <ToggleButtonGroup
-                    value={formats}
-                    onChange={handleFormat}
+                    value={weekdays}
+                    onChange={handleWeekdays}
                     color="primary"
-                    aria-label="text formatting"
+                    aria-label="set weekdays"
+                    // sx={{ columnGap: '10px', "*": { width: '40px', border: 'none', margin: '0px !important', outlineStyle: 'solid', outlineWidth: '1px' } }}
                   >
                     <ToggleButton value="Monday" aria-label="Monday">
                       M
                     </ToggleButton>
-                    <ToggleButton value="italic" aria-label="italic">
+                    <ToggleButton value="Tuesday" aria-label="Tuesday">
                       T
                     </ToggleButton>
-                    <ToggleButton value="underlined" aria-label="underlined">
+                    <ToggleButton value="Wednesday" aria-label="Wednesday">
                       W
                     </ToggleButton>
-                    <ToggleButton value="color" aria-label="color">
+                    <ToggleButton value="Thursday" aria-label="Thursday">
                       TH
+                    </ToggleButton>
+                    <ToggleButton value="Friday" aria-label="Friday">
+                      F
+                    </ToggleButton>
+                    <ToggleButton value="Saturday" aria-label="Saturday">
+                      St
+                    </ToggleButton>
+                    <ToggleButton value="Sunday" aria-label="Sunday">
+                      S
                     </ToggleButton>
                   </ToggleButtonGroup>
                 </Grid2>
