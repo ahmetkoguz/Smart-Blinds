@@ -5,19 +5,25 @@
 
 #define LOWER_PIN 22
 #define REED_PIN 21
-#define LOWER_ADC_THRESHOLD 5  
+#define LOWER_ADC_THRESHOLD 4095  
+#define LOWER_MOTOR_COUNT 5
 
-void adc_init_raise(void)
+typedef struct {
+    int count;
+    int prev_adc;
+} info_struct;
+
+void adc_init_lower(void)
 {
     // Configure ADC width
     adc1_config_width(ADC_WIDTH_BIT_12);
 
-    // Configure ADC channel for the raise/lower operation 
+    // Configure ADe channel for the raise/lower operation 
     adc1_config_channel_atten(ADC1_CHANNEL_0, ADC_ATTEN_DB_12); 
 }
 
 // Interrupt Service Routine (ISR) for the reed sensor
-void IRAM_ATTR reed_sensor_isr_handler(void* arg) {
+void IRAM_ATTR reed_sensor_isr_handler_lower(void* arg) {
     // Reed sensor triggered, stop the lower motor immediately
     gpio_set_level(LOWER_PIN, 0);
     printf("Reed sensor triggered! Stopping lower motor.\n");
@@ -38,25 +44,40 @@ void init_reed_sensor_interrupt_lower() {
     gpio_install_isr_service(0);
 
     // Attach the interrupt handler
-    gpio_isr_handler_add(REED_PIN, reed_sensor_isr_handler, (void*) REED_PIN);
+    gpio_isr_handler_add(REED_PIN, reed_sensor_isr_handler_lower, (void*) REED_PIN);
 }
 
 // Timer callback function for checking ADC values for the lower motor
 void check_adc_lower(void *arg) {
-    int adc_value = adc1_get_raw(ADC1_CHANNEL_0);  // Read MOSFET ADC value
+    info_struct* info = (info_struct*)arg;
 
-    if (adc_value >= LOWER_ADC_THRESHOLD) {
+    int adc_value = adc1_get_raw(ADC1_CHANNEL_0);  // Read MOSFET ADC value
+    printf("ADC value: %d\n", adc_value);
+    printf("Count: %d, Prev: %d\n", info -> count, info -> prev_adc);
+
+    if (adc_value >= LOWER_ADC_THRESHOLD && info -> prev_adc == 0) {
         // ADC threshold exceeded, stop the lower motor
-        gpio_set_level(LOWER_PIN, 0);
-        printf("Lower motor ADC threshold exceeded. Stopping motor. ADC value: %d\n", adc_value);
+        if(info -> count > LOWER_MOTOR_COUNT) {
+            gpio_set_level(LOWER_PIN, 0);
+            printf("Lower motor ADC threshold exceeded. Stopping motor. ADC value: %d\n", adc_value);
+        }
+
+        info -> count += 1;
     }
+
+    info -> prev_adc = adc_value;
 }
 
 // Function to set up the periodic timer for ADC checks
 void setup_adc_timer_lower() {
+    info_struct info;
+    info.count = 0;
+    info.prev_adc = 0;
+
     const esp_timer_create_args_t periodic_timer_args = {
         .callback = &check_adc_lower,
-        .name = "periodic_adc_timer_lower"
+        .name = "periodic_adc_timer_lower",
+        .arg = &info
     };
 
     esp_timer_handle_t periodic_timer;

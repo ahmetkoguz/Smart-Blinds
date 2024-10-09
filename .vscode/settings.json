@@ -11,7 +11,9 @@
     "*.tcc": "c",
     "_routes.h": "c",
     "esp_spiffs.h": "c",
-    "gpio.h": "c"
+    "gpio.h": "c",
+    "bitset": "c",
+    "format": "c"
   },
   "idf.openOcdConfigs": [
     "board/esp32-wrover-kit-3.3v.cfg"
