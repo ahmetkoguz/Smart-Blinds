@@ -1,1 +1,1 @@
-# Smart-Blinds
+# Smart Blinds
