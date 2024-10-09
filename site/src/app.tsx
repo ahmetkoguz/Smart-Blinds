@@ -119,44 +119,7 @@ export const App = () => {
                       value={date}
                       onChange={(newValue) => setDate(newValue)}
                     />
-                    <TimePicker
-                      // label='Raise'
-                      // name='Raise'
-                      // value={date}
-                      // onChange={(newValue) => setDate(newValue)}
-                    />
                   </LocalizationProvider>
-                </Grid2>
-                <Grid2>
-                  <ToggleButtonGroup
-                    value={weekdays}
-                    onChange={handleWeekdays}
-                    color="primary"
-                    aria-label="set weekdays"
-                    // sx={{ columnGap: '10px', "*": { width: '40px', border: 'none', margin: '0px !important', outlineStyle: 'solid', outlineWidth: '1px' } }}
-                  >
-                    <ToggleButton value="Monday" aria-label="Monday">
-                      M
-                    </ToggleButton>
-                    <ToggleButton value="Tuesday" aria-label="Tuesday">
-                      T
-                    </ToggleButton>
-                    <ToggleButton value="Wednesday" aria-label="Wednesday">
-                      W
-                    </ToggleButton>
-                    <ToggleButton value="Thursday" aria-label="Thursday">
-                      TH
-                    </ToggleButton>
-                    <ToggleButton value="Friday" aria-label="Friday">
-                      F
-                    </ToggleButton>
-                    <ToggleButton value="Saturday" aria-label="Saturday">
-                      St
-                    </ToggleButton>
-                    <ToggleButton value="Sunday" aria-label="Sunday">
-                      S
-                    </ToggleButton>
-                  </ToggleButtonGroup>
                 </Grid2>
                 <Grid2>
                     <SaveSchedule date={date} />
