@@ -5,7 +5,13 @@
 
 #define RAISE_PIN 23
 #define REED_PIN 21
-#define RAISE_ADC_THRESHOLD 5  
+#define RAISE_ADC_THRESHOLD 4095  
+#define RAISE_MOTOR_COUNT 5
+
+typedef struct {
+    int count;
+    int prev_adc;
+} info_struct;
 
 void adc_init_raise(void)
 {
@@ -43,20 +49,35 @@ void init_reed_sensor_interrupt_raise() {
 
 // Timer callback function for checking ADC values for the raise motor
 void check_adc_raise(void *arg) {
-    int adc_value = adc1_get_raw(ADC1_CHANNEL_0);  // Read ADC value for the raise motor
+    // info_struct* info = (info_struct*)arg;
 
-    if (adc_value >= RAISE_ADC_THRESHOLD) {
-        // ADC threshold exceeded, stop the raise motor
-        gpio_set_level(RAISE_PIN, 0);
-        printf("Raise motor ADC threshold exceeded. Stopping motor. ADC value: %d\n", adc_value);
-    }
+    // int adc_value = adc1_get_raw(ADC1_CHANNEL_0);  // Read MOSFET ADC value
+    // // printf("ADC value: %d\n", adc_value);
+    // // printf("Count: %d, Prev: %d\n", info -> count, info -> prev_adc);
+
+    // if (adc_value >= RAISE_ADC_THRESHOLD && info -> prev_adc == 0) {
+    //     // ADC threshold exceeded, stop the lower motor
+    //     if(info -> count > RAISE_MOTOR_COUNT) {
+    //         gpio_set_level(RAISE_PIN, 0);
+    //         // printf("Lower motor ADC threshold exceeded. Stopping motor. ADC value: %d\n", adc_value);
+    //     }
+
+    //     info -> count += 1;
+    // }
+
+    // info -> prev_adc = adc_value;
 }
 
 // Function to set up the periodic timer for ADC checks
 void setup_adc_timer_raise() {
+    info_struct info;
+    info.count = 0;
+    info.prev_adc = 0;
+
     const esp_timer_create_args_t periodic_timer_args = {
         .callback = &check_adc_raise,
-        .name = "periodic_adc_timer_raise"
+        .name = "periodic_adc_timer_raise",
+        .arg = &info
     };
 
     esp_timer_handle_t periodic_timer;
