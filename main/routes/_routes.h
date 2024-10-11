@@ -26,6 +26,10 @@ void init_reed_sensor_interrupt_raise(void);
 void setup_adc_timer_lower(void);
 void setup_adc_timer_raise(void);
 
+/******************** Button Functions ****************/
+void init_button(void);
+void button_press(void);
+
 /******************** HTTP Callbacks ****************/
 esp_err_t on_raise(httpd_req_t *req);
 esp_err_t on_lower(httpd_req_t *req);
