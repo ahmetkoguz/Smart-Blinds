@@ -11,8 +11,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-static const char *SSID = "Ahmet Kerim iPone";
-static const char *PASS = "password";
+static const char *SSID = "Victor iPhone";
+static const char *PASS = "anime123";
 
 static const char *TAG = "SERVER";
 #define MAX_APs 20
@@ -289,6 +289,12 @@ void app_main(void)
   wifi_init();
   ESP_ERROR_CHECK(wifi_connect_sta(SSID, PASS, 10000));
   // wifi_connect_ap("esp32ap", "password");
+
+  while (1) {
+        button_press();
+      
+        vTaskDelay(pdMS_TO_TICKS(100));  // Adjust delay as needed
+    }
 
   start_mdns_service();
   init_server();
