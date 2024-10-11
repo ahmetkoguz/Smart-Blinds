@@ -11,8 +11,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-static const char *SSID = "Victor iPhone";
-static const char *PASS = "anime123";
+static const char *SSID = "Ahmet Kerim iPone";
+static const char *PASS = "password";
 
 static const char *TAG = "SERVER";
 #define MAX_APs 20
