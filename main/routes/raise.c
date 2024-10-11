@@ -7,26 +7,26 @@
 #define REED_PIN 21
 #define RAISE_ADC_THRESHOLD 4095  
 #define RAISE_MOTOR_COUNT 5
-#define BUTTON_PIN 19
+//#define BUTTON_PIN 19
 
 typedef struct {
     int count;
     int prev_adc;
 } info_struct;
 
-void init_button(void) {
-    gpio_config_t io_conf = {
-        .intr_type = GPIO_INTR_NEGEDGE,  // Interrupt on falling edge (button press)
-        .mode = GPIO_MODE_INPUT,
-        .pin_bit_mask = (1ULL << BUTTON_PIN),
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .pull_up_en = GPIO_PULLUP_ENABLE  // Enable internal pull-up resistor
-    };
-    gpio_config(&io_conf);
+// void init_button(void) {
+//     gpio_config_t io_conf = {
+//         .intr_type = GPIO_INTR_NEGEDGE,  // Interrupt on falling edge (button press)
+//         .mode = GPIO_MODE_INPUT,
+//         .pin_bit_mask = (1ULL << BUTTON_PIN),
+//         .pull_down_en = GPIO_PULLDOWN_DISABLE,
+//         .pull_up_en = GPIO_PULLUP_ENABLE  // Enable internal pull-up resistor
+//     };
+//     gpio_config(&io_conf);
 
-    // Attach the button interrupt handler
-    gpio_isr_handler_add(BUTTON_PIN, button_isr_handler, NULL);
-}
+//     // Attach the button interrupt handler
+//     gpio_isr_handler_add(BUTTON_PIN, button_isr_handler, NULL);
+// }
 
 void adc_init_raise(void)
 {
@@ -44,31 +44,31 @@ void IRAM_ATTR reed_sensor_isr_handler_raise(void* arg) {
     printf("Reed sensor triggered! Stopping raise motor.\n");
 }
 
-volatile bool button_pressed = false;
+//volatile bool button_pressed = false;
 
-void IRAM_ATTR button_isr_handler(void* arg) {
-    // Debounce the button if necessary
-    static uint32_t last_isr_time = 0;
-    uint32_t isr_time = xTaskGetTickCountFromISR();
-    if (isr_time - last_isr_time > pdMS_TO_TICKS(200)) {
-        button_pressed = true;
-        last_isr_time = isr_time;
-    }
-}
+// void IRAM_ATTR button_isr_handler(void* arg) {
+//     // Debounce the button if necessary
+//     static uint32_t last_isr_time = 0;
+//     uint32_t isr_time = xTaskGetTickCountFromISR();
+//     if (isr_time - last_isr_time > pdMS_TO_TICKS(200)) {
+//         button_pressed = true;
+//         last_isr_time = isr_time;
+//     }
+// }
 
-void handle_button_press(void) {
-    if (button_pressed) {
-        button_pressed = false;  // Clear the flag
+// void handle_button_press(void) {
+//     if (button_pressed) {
+//         button_pressed = false;  // Clear the flag
 
-        printf("Button pressed! Raising blinds to the top.\n");
+//         printf("Button pressed! Raising blinds to the top.\n");
 
-        // Start the raise action
-        toggle_raise(true);
+//         // Start the raise action
+//         toggle_raise(true);
 
-        // The blinds will raise until the top reed sensor is triggered
-        // The existing reed sensor ISR will handle stopping the motor
-    }
-}
+//         // The blinds will raise until the top reed sensor is triggered
+//         // The existing reed sensor ISR will handle stopping the motor
+//     }
+// }
 
 // Function to set up the reed sensor interrupt
 void init_reed_sensor_interrupt_raise() {
