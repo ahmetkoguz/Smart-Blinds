@@ -13,7 +13,9 @@ export const App = () => {
   const [isActive, setIsActive] = useState(false);
   const [raise, setRaise] = useState(false);
   const [lower, setLower] = useState(false);
-  const [date, setDate] = useState();
+
+  const [raiseTime, setRaiseTime] = useState();
+  const [lowerTime, setLowerTime] = useState();
 
   const [pin, setPIN] = useState(1234); // test harcoded pin for demo
   const [pinDialogOpen, setPinDialogOpen] = useState(true);
@@ -79,7 +81,7 @@ export const App = () => {
     newFormats: string[],
   ) => {
     setWeekdays(newFormats);
-    console.log(newFormats);
+    // console.log(newFormats);
   };
 
 
@@ -114,18 +116,24 @@ export const App = () => {
               </Grid2>
               <Grid2 size={4} display='flex' justifyContent='center' pt={3} flexDirection='column' alignItems='center' rowGap={4}>
                 <Grid2>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DateTimePicker
-                      value={date}
-                      onChange={(newValue) => setDate(newValue)}
-                    />
-                    <TimePicker
-                      // label='Raise'
-                      // name='Raise'
-                      // value={date}
-                      // onChange={(newValue) => setDate(newValue)}
-                    />
-                  </LocalizationProvider>
+                  <Grid2 display='flex' gap={3}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <Grid2>
+                        <Typography color='textSecondary'>Raise Time</Typography>
+                        <TimePicker
+                          value={raiseTime}
+                          onChange={(newValue) => setRaiseTime(newValue)}
+                        />
+                      </Grid2>
+                      <Grid2>
+                        <Typography color='textSecondary'>Lower Time</Typography>
+                        <TimePicker
+                          value={lowerTime}
+                          onChange={(newValue) => setLowerTime(newValue)}
+                        />
+                      </Grid2>
+                    </LocalizationProvider>
+                  </Grid2>
                 </Grid2>
                 <Grid2>
                   <ToggleButtonGroup
@@ -159,7 +167,7 @@ export const App = () => {
                   </ToggleButtonGroup>
                 </Grid2>
                 <Grid2>
-                    <SaveSchedule date={date} />
+                    <SaveSchedule raiseTime={raiseTime} lowerTime={lowerTime} weekdays={weekdays} />
                 </Grid2>
               </Grid2>
               <Grid2 size={4} display='flex' justifyContent='center' pt={3}>
