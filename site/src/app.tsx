@@ -4,18 +4,13 @@ import { Raise } from "./views/raise";
 import { Stop } from "./views/stop";
 import { useState } from "preact/hooks";
 import { Route } from "wouter";
-import { DateTimePicker, LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { SaveSchedule } from "./views/saveSchedule";
-import { Lock } from "@mui/icons-material";
+import { Lock, Schedule } from "@mui/icons-material";
+import { Scheduler } from "./views/scheduler";
 
 export const App = () => {
   const [isActive, setIsActive] = useState(false);
   const [raise, setRaise] = useState(false);
   const [lower, setLower] = useState(false);
-
-  const [raiseTime, setRaiseTime] = useState();
-  const [lowerTime, setLowerTime] = useState();
 
   const [pin, setPIN] = useState(1234); // test harcoded pin for demo
   const [pinDialogOpen, setPinDialogOpen] = useState(true);
@@ -74,16 +69,6 @@ export const App = () => {
     setRaise(false);
   }
 
-  const [weekdays, setWeekdays] = useState(() => []);
-
-  const handleWeekdays = (
-    event: React.MouseEvent<HTMLElement>,
-    newFormats: string[],
-  ) => {
-    setWeekdays(newFormats);
-    // console.log(newFormats);
-  };
-
 
   return (
     <Route path="/">
@@ -115,60 +100,7 @@ export const App = () => {
                 <Typography color='textPrimary' variant='h4'>Current Schedule</Typography>
               </Grid2>
               <Grid2 size={4} display='flex' justifyContent='center' pt={3} flexDirection='column' alignItems='center' rowGap={4}>
-                <Grid2>
-                  <Grid2 display='flex' gap={3}>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <Grid2>
-                        <Typography color='textSecondary'>Raise Time</Typography>
-                        <TimePicker
-                          value={raiseTime}
-                          onChange={(newValue) => setRaiseTime(newValue)}
-                        />
-                      </Grid2>
-                      <Grid2>
-                        <Typography color='textSecondary'>Lower Time</Typography>
-                        <TimePicker
-                          value={lowerTime}
-                          onChange={(newValue) => setLowerTime(newValue)}
-                        />
-                      </Grid2>
-                    </LocalizationProvider>
-                  </Grid2>
-                </Grid2>
-                <Grid2>
-                  <ToggleButtonGroup
-                    value={weekdays}
-                    onChange={handleWeekdays}
-                    color="primary"
-                    aria-label="set weekdays"
-                    // sx={{ columnGap: '10px', "*": { width: '40px', border: 'none', margin: '0px !important', outlineStyle: 'solid', outlineWidth: '1px' } }}
-                  >
-                    <ToggleButton value="Monday" aria-label="Monday">
-                      M
-                    </ToggleButton>
-                    <ToggleButton value="Tuesday" aria-label="Tuesday">
-                      T
-                    </ToggleButton>
-                    <ToggleButton value="Wednesday" aria-label="Wednesday">
-                      W
-                    </ToggleButton>
-                    <ToggleButton value="Thursday" aria-label="Thursday">
-                      TH
-                    </ToggleButton>
-                    <ToggleButton value="Friday" aria-label="Friday">
-                      F
-                    </ToggleButton>
-                    <ToggleButton value="Saturday" aria-label="Saturday">
-                      St
-                    </ToggleButton>
-                    <ToggleButton value="Sunday" aria-label="Sunday">
-                      S
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                </Grid2>
-                <Grid2>
-                    <SaveSchedule raiseTime={raiseTime} lowerTime={lowerTime} weekdays={weekdays} />
-                </Grid2>
+                <Scheduler/>
               </Grid2>
               <Grid2 size={4} display='flex' justifyContent='center' pt={3}>
                 <Button 

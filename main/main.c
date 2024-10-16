@@ -222,6 +222,12 @@ static void init_server()
       .handler = on_set_schedule};
   httpd_register_uri_handler(server, &set_schedule_url);
 
+  httpd_uri_t get_schedule_url = {
+      .uri = "/api/setSchedule",
+      .method = HTTP_GET,
+      .handler = on_set_schedule};
+  httpd_register_uri_handler(server, &get_schedule_url);
+
   httpd_uri_t ap_to_sta_url = {
       .uri = "/api/ap-sta",
       .method = HTTP_POST,
@@ -284,6 +290,7 @@ void app_main(void)
   init_lower();
   init_stop();
   init_raise();
+  init_nvs();
   // init_btn();
   // init_servo();
   wifi_init();
