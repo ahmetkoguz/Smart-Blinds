@@ -1,11 +1,12 @@
 import { Button } from "@mui/material";
 
-export const SaveSchedule = ({ raiseTime, lowerTime, weekdays }) => {
+export const SaveSchedule = ({ raiseTime, lowerTime, weekdaysList }) => {
   const onClick = async () => {
     const raise = raiseTime["$H"] + ":" + raiseTime["$m"]
     const lower = lowerTime["$H"] + ":" + lowerTime["$m"]
+    const weekdays = weekdaysList.toString();
 
-    // console.log(raise, lower, weekdays)
+    console.log(raise, lower, weekdays)
 
     await fetch("/api/setSchedule", {
       method: "POST",
@@ -20,6 +21,7 @@ export const SaveSchedule = ({ raiseTime, lowerTime, weekdays }) => {
     <Button 
       onClick={onClick} 
       color='primary'
+      variant='outlined'
     >
         Save Schedule
     </Button>

@@ -89,12 +89,18 @@ esp_err_t on_set_schedule(httpd_req_t *req)
   cJSON *payload = NULL;
 
   if (req->method == HTTP_GET) {
-    // payload = read();
     printf("method: %d\n", req->method);
     printf("get seen\n");
     payload = cJSON_CreateObject();
+
     char* lowerTime = read_string_from_nvs("lower");
+    char* raiseTime = read_string_from_nvs("raise");
+    char* weekdays = read_string_from_nvs("weekdays");
+
     cJSON_AddStringToObject(payload, "lower", lowerTime);
+    cJSON_AddStringToObject(payload, "raise", raiseTime);
+    cJSON_AddStringToObject(payload, "weekdays", weekdays);
+
     if(payload == NULL) {
       httpd_resp_set_status(req, "204 NO CONTENT");
       httpd_resp_send(req, NULL, 0);
@@ -106,7 +112,7 @@ esp_err_t on_set_schedule(httpd_req_t *req)
       return ESP_OK;
     }
   }
-  else {
+  else { // POST
     char buffer[100];
     memset(&buffer, 0, sizeof(buffer));
     printf("req content len: %d", req->content_len);
@@ -122,12 +128,12 @@ esp_err_t on_set_schedule(httpd_req_t *req)
     cJSON *raise_json = cJSON_GetObjectItem(payload, "raise");
     char* raiseTime  = raise_json->valuestring;
     ESP_LOGI(TAG, "Raise: %s", raiseTime);
+    write_string_to_nvs("raise", raiseTime);
 
     cJSON *weekdays_json = cJSON_GetObjectItem(payload, "weekdays");
-    for(int i = 0; i < cJSON_GetArraySize(weekdays_json); i++) {
-
-      printf("Weekdays: %s\n", cJSON_GetArrayItem(weekdays_json, i) -> valuestring);
-    }
+    char* weekdays  = weekdays_json->valuestring;
+    ESP_LOGI(TAG, "Weekdays: %s", weekdays);
+    write_string_to_nvs("weekdays", weekdays);
 
     cJSON_Delete(payload);
     httpd_resp_set_status(req, "204 NO CONTENT");
