@@ -1,7 +1,7 @@
-import { DateTimePicker, LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { SaveSchedule } from "./saveSchedule";
-import { Grid2, Typography, ToggleButtonGroup, ToggleButton, Stack, Button } from '@mui/material';
+import { Grid2, Typography, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import { useState, useEffect } from 'preact/hooks';
 import dayjs from 'dayjs';
 
@@ -12,6 +12,7 @@ export const Scheduler = () => {
     const [weekdays, setWeekdays] = useState(() => []);
 
     useEffect(() => {
+        // Trigger backend endpoint, sending http get request
         fetch("/api/setSchedule")
             .then((res) => res.json().then(val => {
                 setData(val);
@@ -23,14 +24,11 @@ export const Scheduler = () => {
             }
     }, []);
 
-    console.log(scheduleData);
-
     const handleWeekdays = (
         event: React.MouseEvent<HTMLElement>,
         newFormats: string[],
     ) => {
         setWeekdays(newFormats);
-        // console.log(newFormats);
     };
 
     return (
@@ -67,7 +65,7 @@ export const Scheduler = () => {
                         TUE
                     </ToggleButton>
                     <ToggleButton value="Wednesday" aria-label="Wednesday">
-                        WEN
+                        WED
                     </ToggleButton>
                     <ToggleButton value="Thursday" aria-label="Thursday">
                         THU
@@ -85,6 +83,6 @@ export const Scheduler = () => {
             </Grid2>
             <Grid2>
                 <SaveSchedule raiseTime={raiseTime} lowerTime={lowerTime} weekdaysList={weekdays} />
-            </Grid2></>
+        </Grid2></>
     )
 }

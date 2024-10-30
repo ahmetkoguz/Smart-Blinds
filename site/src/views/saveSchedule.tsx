@@ -8,6 +8,7 @@ export const SaveSchedule = ({ raiseTime, lowerTime, weekdaysList }) => {
 
     console.log(raise, lower, weekdays)
 
+    // Trigger backend endpoint, sending http post request
     await fetch("/api/setSchedule", {
       method: "POST",
       headers: {

@@ -84,6 +84,7 @@ char* read_string_from_nvs(const char* key) {
     return NULL;
 }
 
+// Schedule backend endpoint
 esp_err_t on_set_schedule(httpd_req_t *req)
 {
   cJSON *payload = NULL;
@@ -93,10 +94,12 @@ esp_err_t on_set_schedule(httpd_req_t *req)
     printf("get seen\n");
     payload = cJSON_CreateObject();
 
+    // Read schedule info from non-volatile storage (nvs)
     char* lowerTime = read_string_from_nvs("lower");
     char* raiseTime = read_string_from_nvs("raise");
     char* weekdays = read_string_from_nvs("weekdays");
 
+    // Add schedule to http response payload
     cJSON_AddStringToObject(payload, "lower", lowerTime);
     cJSON_AddStringToObject(payload, "raise", raiseTime);
     cJSON_AddStringToObject(payload, "weekdays", weekdays);
@@ -105,11 +108,11 @@ esp_err_t on_set_schedule(httpd_req_t *req)
       httpd_resp_set_status(req, "204 NO CONTENT");
       httpd_resp_send(req, NULL, 0);
     }
-    else {
+    else { // If payload is not empty, send response
       char* data = cJSON_Print(payload);
       printf("payload found: %s\n", data);
       httpd_resp_send(req, data, strlen(data));
-      return ESP_OK;
+      return ESP_OK; // Set request status to successful
     }
   }
   else { // POST
