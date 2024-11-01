@@ -5,6 +5,7 @@ idf_component_register(
     "routes/magnetometer.c"
     "routes/servo.c"
     "routes/raise.c"
+    "routes/pin.c"
     "routes/lower.c"
     "routes/stop.c"
     "routes/setSchedule.c"

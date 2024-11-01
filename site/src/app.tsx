@@ -1,21 +1,27 @@
-import { Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid2, IconButton, styled, TextField, ToggleButton, ToggleButtonGroup, Tooltip, tooltipClasses, TooltipProps, Typography } from "@mui/material";
+import { Button, Container, Grid2, IconButton, Tooltip, Typography } from "@mui/material";
 import { Lower } from "./views/lower";
 import { Raise } from "./views/raise";
 import { Stop } from "./views/stop";
 import { useState } from "preact/hooks";
 import { Route } from "wouter";
-import { Edit, Info, InfoOutlined, Lock, Schedule } from "@mui/icons-material";
+import { Edit, InfoOutlined, Lock } from "@mui/icons-material";
 import { Scheduler } from "./views/scheduler";
 import { PinDialog } from "./views/pin";
 
 export const App = () => {
   const [isActive, setIsActive] = useState(false);
+  const [edit, setEdit] = useState(false);
   const [raise, setRaise] = useState(false);
   const [lower, setLower] = useState(false);
 
   const [pinDialogOpen, setPinDialogOpen] = useState(true);
 
   const handleOpen = () => {
+    setPinDialogOpen(true);
+  };
+
+  const handleEdit = () => {
+    setEdit(true);
     setPinDialogOpen(true);
   };
 
@@ -32,7 +38,7 @@ export const App = () => {
   return (
     <Route path="/">
       <Container maxWidth='sm'>
-        <PinDialog pinDialogOpen={pinDialogOpen} handleClose={handleClose}/>
+        <PinDialog pinDialogOpen={pinDialogOpen} handleClose={handleClose} edit={edit} setEdit={setEdit}/>
           <Grid2 container rowSpacing='50px' sx={{ display: 'flex', flexDirection: 'column', alignContent: 'center' }}>
             {/* Title */}
             <Grid2 size={12} display='flex' justifyContent='center'>
@@ -81,11 +87,11 @@ export const App = () => {
                   Lock Blinds
                 </Button>
               </Grid2>
-              <Grid2 size={2} display='flex' justifyContent='center' pt={3}>
+              <Grid2 size={2} display='flex' justifyContent='center' pt={3} pb={5}>
                 <Button 
                   variant='contained' 
                   startIcon={<Edit />} 
-                  onClick={handleOpen}
+                  onClick={handleEdit}
                   fullWidth
                 >
                   Edit PIN 

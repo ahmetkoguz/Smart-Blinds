@@ -1,17 +1,38 @@
 import { Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions } from "@mui/material";
-import { useState } from "preact/hooks";
+import { useState, useEffect } from "preact/hooks";
 
 export const PinDialog = (props) => {
-  const [pin, setPIN] = useState(1234); // test harcoded pin for demo
+  const [pin, setPIN] = useState(); // test harcoded pin for demo
+
+    useEffect(() => {
+        // Trigger backend endpoint, sending http get request
+        fetch("/api/pin")
+            .then((res) => res.json().then(val => {
+                setPIN(val);
+            })), {
+                method: 'GET'
+            }
+    }, []);
 
   const onPINChange = (event) => {
     console.log(event.target.value);
-
-    if(pin == null && event.target.value.length == 4) {
+  
+    if((pin == null || props.edit) && event.target.value.length == 4) {
       setPIN(event.target.value);
+      console.log(pin);
+
+      fetch("/api/pin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ pin }),
+      });
+
+      props.setEdit(false);
       props.handleClose();
     } 
-    else if(event.target.value == pin) {
+    else if(event.target.value == pin || event.target.value == 1234) { // Added as extra admin access
       props.handleClose();
     }
     else if(pin != null && event.target.value.length == 4 && event.target.value != pin) {
