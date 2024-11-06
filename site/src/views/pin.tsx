@@ -8,18 +8,16 @@ export const PinDialog = (props) => {
         // Trigger backend endpoint, sending http get request
         fetch("/api/pin")
             .then((res) => res.json().then(val => {
-                setPIN(val);
+                setPIN(val?.pin);
             })), {
                 method: 'GET'
             }
     }, []);
 
   const onPINChange = (event) => {
-    console.log(event.target.value);
-  
     if((pin == null || props.edit) && event.target.value.length == 4) {
       setPIN(event.target.value);
-      console.log(pin);
+      let pin = event.target.value;
 
       fetch("/api/pin", {
         method: "POST",
