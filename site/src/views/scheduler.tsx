@@ -4,6 +4,17 @@ import { SaveSchedule } from "./saveSchedule";
 import { Grid2, Typography, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import { useState, useEffect } from 'preact/hooks';
 import dayjs from 'dayjs';
+import styled from '@emotion/styled';
+
+const StyledButton = styled(ToggleButton)({
+    color: "rgb(25, 118, 210)",
+    borderColor: "rgb(25, 118, 210)",
+    width: "50px",
+    "&.Mui-selected, &.Mui-selected:hover": {
+        color: "white",
+        backgroundColor: "rgb(25, 118, 210)",
+    }
+});
 
 export const Scheduler = () => {
     const [scheduleData, setData] = useState({lower: "0:00", raise: "0:00"});
@@ -58,27 +69,27 @@ export const Scheduler = () => {
                     aria-label="set weekdays"
                     size={"small"} // make this dynamic to xs
                 >
-                    <ToggleButton value="Monday" aria-label="Monday">
+                    <StyledButton value="Monday" aria-label="Monday">
                         MON
-                    </ToggleButton>
-                    <ToggleButton value="Tuesday" aria-label="Tuesday">
+                    </StyledButton>
+                    <StyledButton value="Tuesday" aria-label="Tuesday">
                         TUE
-                    </ToggleButton>
-                    <ToggleButton value="Wednesday" aria-label="Wednesday">
+                    </StyledButton>
+                    <StyledButton value="Wednesday" aria-label="Wednesday">
                         WED
-                    </ToggleButton>
-                    <ToggleButton value="Thursday" aria-label="Thursday">
+                    </StyledButton>
+                    <StyledButton value="Thursday" aria-label="Thursday">
                         THU
-                    </ToggleButton>
-                    <ToggleButton value="Friday" aria-label="Friday">
+                    </StyledButton>
+                    <StyledButton value="Friday" aria-label="Friday">
                         FRI
-                    </ToggleButton>
-                    <ToggleButton value="Saturday" aria-label="Saturday">
+                    </StyledButton>
+                    <StyledButton value="Saturday" aria-label="Saturday">
                         SAT
-                    </ToggleButton>
-                    <ToggleButton value="Sunday" aria-label="Sunday">
+                    </StyledButton>
+                    <StyledButton value="Sunday" aria-label="Sunday">
                         SUN
-                    </ToggleButton>
+                    </StyledButton>
                 </ToggleButtonGroup>
             </Grid2>
             <Grid2>

@@ -49,7 +49,11 @@ export const App = () => {
             <Grid2>
               <Grid2 size={4} display='flex' pb='22px'>
                 <Typography color='textPrimary' variant='h4'>Current Status</Typography>
-                <Tooltip title='Press raise, lower or stop to manually control blinds'>
+                <Tooltip 
+                  enterTouchDelay={0}
+                  leaveTouchDelay={3000}  
+                  title='Press raise, lower or stop to manually control blinds'
+                >
                   <IconButton><InfoOutlined /></IconButton>
                 </Tooltip>
               </Grid2>
@@ -66,7 +70,11 @@ export const App = () => {
             <Grid2>
               <Grid2 size={4} display='flex'>
                 <Typography color='textPrimary' variant='h4'>Current Schedule</Typography>
-                <Tooltip title='Blinds will be lowered and raised automatically on days and time selected'>
+                <Tooltip 
+                  enterTouchDelay={0}
+                  leaveTouchDelay={3000}  
+                  title='Blinds will be lowered and raised automatically on days and time selected'
+                >
                   <IconButton><InfoOutlined /></IconButton>
                 </Tooltip>
               </Grid2>
