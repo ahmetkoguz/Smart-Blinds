@@ -40,9 +40,9 @@ export const PinDialog = (props) => {
   
 return (
     <Dialog open={props.pinDialogOpen} disableRestoreFocus slotProps={{ backdrop: { style: { backgroundColor: "white" } } }} >
-      <DialogTitle>Enter PIN</DialogTitle><DialogContent>
+      <DialogTitle>{props.edit ? "Edit PIN" : "Enter PIN"}</DialogTitle><DialogContent>
       <DialogContentText>
-        To gain access to Smart Blinds enter your PIN.
+        {props.edit ? "Enter your desired PIN to use for access." : "To gain access to Smart Blinds enter your PIN."}
       </DialogContentText>
       <TextField
         autoFocus

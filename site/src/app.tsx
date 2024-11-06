@@ -48,7 +48,7 @@ export const App = () => {
             {/* Status */}
             <Grid2>
               <Grid2 size={4} display='flex' pb='22px'>
-                <Typography color='textPrimary' variant='h4'>Current Status</Typography>
+                <Typography color='textPrimary' variant='h4' fontSize="30px">Current Status</Typography>
                 <Tooltip 
                   enterTouchDelay={0}
                   leaveTouchDelay={3000}  
@@ -69,7 +69,7 @@ export const App = () => {
             {/* Schedule */}
             <Grid2>
               <Grid2 size={4} display='flex'>
-                <Typography color='textPrimary' variant='h4'>Current Schedule</Typography>
+                <Typography color='textPrimary' variant='h4' fontSize="30px">Current Schedule</Typography>
                 <Tooltip 
                   enterTouchDelay={0}
                   leaveTouchDelay={3000}  
