@@ -4,7 +4,6 @@
 #include "esp_timer.h"
 
 #define LOWER_PIN 22
-#define REED_PIN 21
 #define LOWER_ADC_THRESHOLD 4095  
 #define LOWER_MOTOR_COUNT 5
 
@@ -23,61 +22,61 @@ void adc_init_lower(void)
 }
 
 // Interrupt Service Routine (ISR) for the reed sensor
-void IRAM_ATTR reed_sensor_isr_handler_lower(void* arg) {
-    // Reed sensor triggered, stop the lower motor immediately
-    gpio_set_level(LOWER_PIN, 0);
-    printf("Reed sensor triggered! Stopping lower motor.\n");
-}
+// void IRAM_ATTR reed_sensor_isr_handler_lower(void* arg) {
+//     // Reed sensor triggered, stop the lower motor immediately
+//     gpio_set_level(LOWER_PIN, 0);
+//     printf("Reed sensor triggered! Stopping lower motor.\n");
+// }
 
 // Function to set up the reed sensor interrupt
-void init_reed_sensor_interrupt_lower() {
-    gpio_config_t io_conf = {
-        .intr_type = GPIO_INTR_NEGEDGE,  // Trigger on falling edge
-        .mode = GPIO_MODE_INPUT,
-        .pin_bit_mask = (1ULL << REED_PIN),  // Pin mask for reed sensor
-        .pull_down_en = GPIO_PULLDOWN_ENABLE,
-        .pull_up_en = GPIO_PULLUP_DISABLE
-    };
-    gpio_config(&io_conf);
+// void init_reed_sensor_interrupt_lower() {
+//     gpio_config_t io_conf = {
+//         .intr_type = GPIO_INTR_NEGEDGE,  // Trigger on falling edge
+//         .mode = GPIO_MODE_INPUT,
+//         .pin_bit_mask = (1ULL << REED_PIN),  // Pin mask for reed sensor
+//         .pull_down_en = GPIO_PULLDOWN_ENABLE,
+//         .pull_up_en = GPIO_PULLUP_DISABLE
+//     };
+//     gpio_config(&io_conf);
 
-    // Install GPIO ISR handler service
-    gpio_install_isr_service(0);
+//     // Install GPIO ISR handler service
+//     gpio_install_isr_service(0);
 
-    // Attach the interrupt handler
-    gpio_isr_handler_add(REED_PIN, reed_sensor_isr_handler_lower, (void*) REED_PIN);
-}
+//     // Attach the interrupt handler
+//     gpio_isr_handler_add(REED_PIN, reed_sensor_isr_handler_lower, (void*) REED_PIN);
+// }
 
 // Timer callback function for checking ADC values for the lower motor
 void check_adc_lower(void *arg) {
-    // info_struct* info = (info_struct*)arg;
+    info_struct* info = (info_struct*)arg;
 
-    // int adc_value = adc1_get_raw(ADC1_CHANNEL_0);  // Read MOSFET ADC value
-    // // printf("ADC value: %d\n", adc_value);
-    // // printf("Count: %d, Prev: %d\n", info -> count, info -> prev_adc);
+    int adc_value = adc1_get_raw(ADC1_CHANNEL_0);  // Read MOSFET ADC value
+    // printf("ADC value: %d\n", adc_value);
+    // printf("Count: %d, Prev: %d\n", info -> count, info -> prev_adc);
 
-    // if (adc_value >= LOWER_ADC_THRESHOLD && info -> prev_adc == 0) {
-    //     // ADC threshold exceeded, stop the lower motor
-    //     if(info -> count > LOWER_MOTOR_COUNT) {
-    //         gpio_set_level(LOWER_PIN, 0);
-    //         // printf("Lower motor ADC threshold exceeded. Stopping motor. ADC value: %d\n", adc_value);
-    //     }
+    if (adc_value >= LOWER_ADC_THRESHOLD && info -> prev_adc == 0) {
+        // ADC threshold exceeded, stop the lower motor
+        if(info -> count > LOWER_MOTOR_COUNT) {
+            gpio_set_level(LOWER_PIN, 0);
+            // printf("Lower motor ADC threshold exceeded. Stopping motor. ADC value: %d\n", adc_value);
+        }
 
-    //     info -> count += 1;
-    // }
+        info -> count += 1;
+    }
 
-    // info -> prev_adc = adc_value;
+    info -> prev_adc = adc_value;
 }
 
 // Function to set up the periodic timer for ADC checks
 void setup_adc_timer_lower() {
-    info_struct info;
-    info.count = 0;
-    info.prev_adc = 0;
+    info_struct* info = malloc(sizeof(info_struct));
+    info -> count = 0;
+    info -> prev_adc = 0;
 
     const esp_timer_create_args_t periodic_timer_args = {
         .callback = &check_adc_lower,
         .name = "periodic_adc_timer_lower",
-        .arg = &info
+        .arg = info
     };
 
     esp_timer_handle_t periodic_timer;
@@ -95,7 +94,7 @@ void init_lower(void) {
     adc_init_lower();  // Initialize the ADC
 
     // Initialize reed sensor interrupt
-    init_reed_sensor_interrupt_lower();
+    //init_reed_sensor_interrupt_lower();
 
     // Set up the periodic timer for ADC checks
     setup_adc_timer_lower();
@@ -105,12 +104,12 @@ void toggle_lower(bool is_on) {
     if (is_on) {
         // Read ADC value
         int adc_value = adc1_get_raw(ADC1_CHANNEL_0); 
-        int reed_sensor_state = gpio_get_level(REED_PIN); // Check reed sensor state
+        //int reed_sensor_state = gpio_get_level(REED_PIN); // Check reed sensor state
 
-        printf("reed: %d, adc_val: %d\n", reed_sensor_state, adc_value);
+        //printf("reed: %d, adc_val: %d\n", reed_sensor_state, adc_value);
 
         // Check if ADC value is below the threshold and reed sensor is not triggered
-        if (adc_value < LOWER_ADC_THRESHOLD && reed_sensor_state == 0) {
+        if (adc_value < LOWER_ADC_THRESHOLD == 0) {
             // If below the threshold and reed sensor not triggered, allow the motor to lower
             gpio_set_level(LOWER_PIN, 1);
         } 
