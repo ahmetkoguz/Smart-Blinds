@@ -118,9 +118,9 @@ esp_err_t on_set_schedule(httpd_req_t *req)
   else { // POST
     char buffer[100];
     memset(&buffer, 0, sizeof(buffer));
-    printf("req content len: %d", req->content_len);
+    // printf("req content len: %d\n", req->content_len);
     httpd_req_recv(req, buffer, req->content_len);
-    printf("got here %s\n", buffer);
+    printf("set schedule got here %s\n", buffer);
 
     payload = cJSON_Parse(buffer);
     cJSON *lower_json = cJSON_GetObjectItem(payload, "lower");

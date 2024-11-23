@@ -6,7 +6,9 @@
 #include "esp_log.h"
 #include "_routes.h"
 #include "freertos/task.h"
-#include "freertos/FreeRTOS-Kernel.h"
+#include "esp_sleep.h"
+
+static const char *TAG = "SERVER";
 
 // Declarations for the functions from raise.c and lower.c
 void check_and_perform_scheduled_actions() {
@@ -26,13 +28,22 @@ void check_and_perform_scheduled_actions() {
     struct tm timeinfo;
     char current_time[6];
 
-    // Get current time
     time(&now);
     localtime_r(&now, &timeinfo);
-    strftime(current_time, sizeof(current_time), "%H:%M", &timeinfo);
+    // Is time set? If not, tm_year will be (1970 - 1900).
+    if (timeinfo.tm_year < (2016 - 1900)) {
+        // ESP_LOGI(TAG, "Time is not set yet. Connecting to WiFi and getting time over NTP.");
+        obtain_time();
+        // update 'now' variable with current time
+        time(&now);
+    }
+
+    strftime(current_time, sizeof(current_time), "%H:%M", &now);
 
     // Get current weekday (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
     int current_weekday = timeinfo.tm_wday;
+
+    printf("Current weekday: %d, current time: %s\n", current_weekday, current_time);
 
     // Check if today is one of the scheduled weekdays
     if (weekdays[current_weekday] == '1') {
@@ -49,7 +60,7 @@ void check_and_perform_scheduled_actions() {
     }
 }
 
-void app_main() {
+void schedule_handler() {
     // Initialize NVS
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {

@@ -37,10 +37,10 @@ esp_err_t on_pin_handle(httpd_req_t *req);
 /******************** Toggle Functions ****************/
 void toggle_lower(bool is_on);
 void toggle_raise(bool is_on);
-void toggle_stop(bool is_on);
 
 /******************** Utility Functions ****************/
 char* read_string_from_nvs(const char* key);
 void write_string_to_nvs(const char* key, const char* value);
+void schedule_handler();
 
 #endif // ROUTES_H

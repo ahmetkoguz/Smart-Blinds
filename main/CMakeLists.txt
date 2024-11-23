@@ -8,6 +8,7 @@ idf_component_register(
     "routes/pin.c"
     "routes/lower.c"
     "routes/setSchedule.c"
+    "routes/doSchedule.c"
     "main.c"
   INCLUDE_DIRS 
     "."
