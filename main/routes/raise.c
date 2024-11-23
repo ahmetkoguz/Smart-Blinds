@@ -6,12 +6,10 @@
 #define RAISE_PIN 18
 #define REED_PIN 21
 
-// TODO: does not work, and reboots on sensing.
 // Interrupt Service Routine (ISR) for the reed sensor
 void IRAM_ATTR reed_sensor_isr_handler_raise(void* arg) {
     // Reed sensor triggered, stop the raise motor immediately
-    gpio_set_level(RAISE_PIN, 0);
-    printf("Reed sensor triggered! Stopping raise motor.\n");
+    gpio_set_level(RAISE_PIN, 0); // Adding printf here breaks, need to keep isr very minimal
 }
 
 // Function to set up the reed sensor interrupt
@@ -29,7 +27,7 @@ void init_reed_sensor_interrupt_raise() {
     gpio_install_isr_service(0);
 
     // Attach the interrupt handler
-    gpio_isr_handler_add(REED_PIN, reed_sensor_isr_handler_raise, (void*) REED_PIN);
+    gpio_isr_handler_add(REED_PIN, reed_sensor_isr_handler_raise, NULL);
 }
 
 // Initialization function for the raise motor control
