@@ -33,9 +33,9 @@ void write_string_to_nvs(const char* key, const char* value) {
     // Write the string to NVS
     err = nvs_set_str(my_handle, key, value);
     if (err != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to write string to NVS!");
+        ESP_LOGE(TAG, "Failed to write string %s to NVS!", key);
     } else {
-        ESP_LOGI(TAG, "String written to NVS");
+        ESP_LOGI(TAG, "String %s written to %s in NVS", value, key);
     }
 
     // Commit the changes

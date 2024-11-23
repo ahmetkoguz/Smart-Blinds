@@ -5,11 +5,10 @@
 #include "nvs.h"
 #include "esp_log.h"
 #include "_routes.h"
+#include "freertos/task.h"
+#include "freertos/FreeRTOS-Kernel.h"
 
 // Declarations for the functions from raise.c and lower.c
-void toggle_raise(int flag);
-void toggle_lower(int flag);
-
 void check_and_perform_scheduled_actions() {
     // Read time from NVS
     char* lowerTime = read_string_from_nvs("lower");
@@ -18,10 +17,7 @@ void check_and_perform_scheduled_actions() {
 
     // Check for NULL pointers
     if (lowerTime == NULL || raiseTime == NULL || weekdays == NULL) {
-        ESP_LOGE("Scheduler", "Failed to read scheduled times from NVS");
-        free(lowerTime);
-        free(raiseTime);
-        free(weekdays);
+        printf("Failed to read scheduled times from NVS");
         return;
     }
 
@@ -42,20 +38,15 @@ void check_and_perform_scheduled_actions() {
     if (weekdays[current_weekday] == '1') {
         // Check if it's time to raise the blinds
         if (strcmp(current_time, raiseTime) == 0) {
-            ESP_LOGI("Scheduler", "Raising blinds at scheduled time: %s", raiseTime);
+            printf("Raising blinds at scheduled time: %s", raiseTime);
             toggle_raise(1);
         }
         // Check if it's time to lower the blinds
         if (strcmp(current_time, lowerTime) == 0) {
-            ESP_LOGI("Scheduler", "Lowering blinds at scheduled time: %s", lowerTime);
+            printf("Lowering blinds at scheduled time: %s", lowerTime);
             toggle_lower(1);
         }
     }
-
-    // Free dynamically allocated strings if applicable
-    free(lowerTime);
-    free(raiseTime);
-    free(weekdays);
 }
 
 void app_main() {

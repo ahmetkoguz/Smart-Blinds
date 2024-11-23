@@ -13,6 +13,8 @@
 
 static const char *SSID = "Ahmet Kerim iPone";
 static const char *PASS = "password";
+// static const char *SSID = "Marks iPhone14";
+// static const char *PASS = "Password1234";
 
 static const char *TAG = "SERVER";
 #define MAX_APs 20
@@ -210,12 +212,6 @@ static void init_server()
       .handler = on_lower};
   httpd_register_uri_handler(server, &lower_url);
 
-  httpd_uri_t stop_url = {
-      .uri = "/api/stop",
-      .method = HTTP_POST,
-      .handler = on_stop};
-  httpd_register_uri_handler(server, &stop_url);
-
   httpd_uri_t set_schedule_url = {
       .uri = "/api/setSchedule",
       .method = HTTP_POST,
@@ -300,7 +296,6 @@ void app_main(void)
   esp_vfs_spiffs_unregister(NULL);
 
   init_lower();
-  init_stop();
   init_raise();
   init_nvs();
   // init_btn();
