@@ -1,4 +1,4 @@
-import { Button, Container, Grid2, IconButton, Icon, Tooltip, Typography } from "@mui/material";
+import { Button, Container, Grid2, IconButton, Tooltip, Typography } from "@mui/material";
 import { Lower } from "./views/lower";
 import { Raise } from "./views/raise";
 import { Stop } from "./views/stop";
@@ -7,7 +7,6 @@ import { Route } from "wouter";
 import { Edit, InfoOutlined, Lock } from "@mui/icons-material";
 import { Scheduler } from "./views/scheduler";
 import { PinDialog } from "./views/pin";
-import Logo from "./Blind_Guys.svg";
 
 export const App = () => {
   const [isActive, setIsActive] = useState(false);
@@ -42,11 +41,8 @@ export const App = () => {
         <PinDialog pinDialogOpen={pinDialogOpen} handleClose={handleClose} edit={edit} setEdit={setEdit}/>
           <Grid2 container rowSpacing='50px' sx={{ display: 'flex', flexDirection: 'column', alignContent: 'center' }}>
             {/* Title */}
-            <Grid2 pt={1} size={12} display='flex' justifyContent='center'>
-              <Typography pr={0.5} color='primary' fontSize='3rem' variant='h2'>Smart Blinds</Typography>
-              <Icon sx={{ fontSize: 55 }}>
-                <img src={Logo} height={100} width={100} />
-              </Icon>
+            <Grid2 size={12} display='flex' justifyContent='center'>
+              <Typography color='primary' fontSize='3rem' variant='h2'>Smart Blinds</Typography>
             </Grid2>
 
             {/* Status */}
