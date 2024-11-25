@@ -15,13 +15,6 @@ const StyledButton = styled(ToggleButton)({
     }
 });
 
-const checkSchedule = () => {
-    setInterval(function() {
-        let dateTime = new Date();
-
-    }, 60 * 1000);
-}
-
 const getDayOfWeek = (date) => {
     const dayOfWeek = new Date(date).getDay();    
     return isNaN(dayOfWeek) ? null : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek];
@@ -33,46 +26,45 @@ export const Scheduler = () => {
     const [lowerTime, setLowerTime] = useState(dayjs("2024-04-17T"+scheduleData?.lower));
     const [weekdays, setWeekdays] = useState(() => []);
 
-    // fix multiple triggers (useEffect doesn't work here)
         // Set timer for every minute to check if schedule is ready (but this won't work outside the app?)
-        setInterval(async function() {
-            let dateTime = new Date();
-            const curr_day = getDayOfWeek(dateTime);
-            const curr_time = dateTime.toLocaleTimeString("en-US", { hour: "2-digit", "minute": "2-digit", hour12: false });
+        // setInterval(async function() {
+        //     let dateTime = new Date();
+        //     const curr_day = getDayOfWeek(dateTime);
+        //     const curr_time = dateTime.toLocaleTimeString("en-US", { hour: "2-digit", "minute": "2-digit", hour12: false });
 
-            console.log(curr_day, curr_time);
+        //     console.log(curr_day, curr_time);
 
-            const raise = raiseTime["$H"] + ":" + raiseTime["$m"]
-            const lower = lowerTime["$H"] + ":" + lowerTime["$m"]
+        //     const raise = raiseTime["$H"] + ":" + raiseTime["$m"]
+        //     const lower = lowerTime["$H"] + ":" + lowerTime["$m"]
 
-            console.log(weekdays);
+        //     console.log(weekdays);
 
-            if(weekdays.includes(curr_day)) {
-                console.log(raise, lower)
-                if(raise == curr_time) {
-                    console.log("Raise trigger");
-                    let is_on = true;
-                    await fetch("/api/raise", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ is_on }), // name must match payload name in backend
-                    });
-                }
-                if(lower == curr_time) {
-                    console.log("Lower trigger");
-                    let is_on = true;
-                    await fetch("/api/lower", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ is_on }), // name must match payload name in backend
-                    });
-                }
-            }
-        }, 60 * 1000);
+        //     if(weekdays.includes(curr_day)) {
+        //         console.log(raise, lower)
+        //         if(raise == curr_time) {
+        //             console.log("Raise trigger");
+        //             let is_on = true;
+        //             await fetch("/api/raise", {
+        //             method: "POST",
+        //             headers: {
+        //                 "Content-Type": "application/json",
+        //             },
+        //             body: JSON.stringify({ is_on }), // name must match payload name in backend
+        //             });
+        //         }
+        //         if(lower == curr_time) {
+        //             console.log("Lower trigger");
+        //             let is_on = true;
+        //             await fetch("/api/lower", {
+        //             method: "POST",
+        //             headers: {
+        //                 "Content-Type": "application/json",
+        //             },
+        //             body: JSON.stringify({ is_on }), // name must match payload name in backend
+        //             });
+        //         }
+        //     }
+        // }, 60 * 1000);
     
     useEffect(() => {
         // Trigger backend endpoint, sending http get request
