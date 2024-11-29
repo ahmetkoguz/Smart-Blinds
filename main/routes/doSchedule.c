@@ -7,8 +7,7 @@
 #include "_routes.h"
 #include "freertos/task.h"
 #include "esp_sleep.h"
-
-static const char *TAG = "SERVER";
+#include <sys/time.h>
 
 // Declarations for the functions from raise.c and lower.c
 void check_and_perform_scheduled_actions() {
@@ -16,6 +15,7 @@ void check_and_perform_scheduled_actions() {
     char* lowerTime = read_string_from_nvs("lower");
     char* raiseTime = read_string_from_nvs("raise");
     char* weekdays = read_string_from_nvs("weekdays");
+    // char* curr_time = read_string_from_nvs("curr_time");
 
     // Check for NULL pointers
     if (lowerTime == NULL || raiseTime == NULL || weekdays == NULL) {
@@ -23,53 +23,37 @@ void check_and_perform_scheduled_actions() {
         return;
     }
 
-    // Assuming time is stored in "HH:MM" format
     time_t now;
-    struct tm timeinfo;
-    char current_time[6];
+    struct tm time_info;
 
-    time(&now);
-    localtime_r(&now, &timeinfo);
-    // Is time set? If not, tm_year will be (1970 - 1900).
-    if (timeinfo.tm_year < (2016 - 1900)) {
-        // ESP_LOGI(TAG, "Time is not set yet. Connecting to WiFi and getting time over NTP.");
-        obtain_time();
-        // update 'now' variable with current time
-        time(&now);
-    }
+    time(&now); // Get current system time
+    localtime_r(&now, &time_info); // Convert time_t to struct tm for easier handling
 
-    strftime(current_time, sizeof(current_time), "%H:%M", &now);
+    char time_str[6];  // hh:mm requires 6 bytes (including null terminator)
+    char day_str[10];  // Weekday name requires up to 10 bytes (e.g., "Wednesday")
 
-    // Get current weekday (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
-    int current_weekday = timeinfo.tm_wday;
+    strftime(time_str, sizeof(time_str), "%H:%M", &time_info);
+    strftime(day_str, sizeof(day_str), "%A", &time_info);
 
-    printf("Current weekday: %d, current time: %s\n", current_weekday, current_time);
+    printf("Current weekday and time: %s %s\n", day_str, time_str);
 
-    // Check if today is one of the scheduled weekdays
-    if (weekdays[current_weekday] == '1') {
+    // Check if today is one of the scheduled weekdays (problem if both at same time?)
+    if (strstr(weekdays, day_str)) {
         // Check if it's time to raise the blinds
-        if (strcmp(current_time, raiseTime) == 0) {
-            printf("Raising blinds at scheduled time: %s", raiseTime);
+        if (strcmp(time_str, raiseTime) == 0) {
+            printf("Raising blinds at scheduled time: %s\n", raiseTime);
             toggle_raise(1);
         }
         // Check if it's time to lower the blinds
-        if (strcmp(current_time, lowerTime) == 0) {
-            printf("Lowering blinds at scheduled time: %s", lowerTime);
+        if (strcmp(time_str, lowerTime) == 0) {
+            printf("Lowering blinds at scheduled time: %s\n", lowerTime);
             toggle_lower(1);
         }
     }
 }
 
 void schedule_handler() {
-    // Initialize NVS
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
-
-    // Example scheduler loop   
+    // Scheduler loop   
     while (1) {
         check_and_perform_scheduled_actions();
         vTaskDelay(pdMS_TO_TICKS(60000)); // Check every minute

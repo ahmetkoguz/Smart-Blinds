@@ -42,5 +42,6 @@ void toggle_raise(bool is_on);
 char* read_string_from_nvs(const char* key);
 void write_string_to_nvs(const char* key, const char* value);
 void schedule_handler();
+void setSystemTime(char* curr_time);
 
 #endif // ROUTES_H
