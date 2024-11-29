@@ -6,6 +6,10 @@ export const SaveSchedule = ({ raiseTime, lowerTime, weekdaysList }) => {
     const lower = lowerTime["$H"] + ":" + lowerTime["$m"]
     const weekdays = weekdaysList.toString();
 
+    let dateTime = new Date();
+    const curr_time = dateTime.toDateString() + " " + dateTime.toLocaleTimeString("en-US", { hour: "2-digit", "minute": "2-digit", "second": "2-digit",  hour12: false });
+
+    console.log(curr_time)
     console.log(raise, lower, weekdays)
 
     // Trigger backend endpoint, sending http post request
@@ -14,7 +18,7 @@ export const SaveSchedule = ({ raiseTime, lowerTime, weekdaysList }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ raise, lower, weekdays }),
+      body: JSON.stringify({ raise, lower, weekdays, curr_time }),
     });
   };
 

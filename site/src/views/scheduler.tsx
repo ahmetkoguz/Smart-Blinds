@@ -9,7 +9,6 @@ import styled from '@emotion/styled';
 const StyledButton = styled(ToggleButton)({
     color: "rgb(25, 118, 210)",
     borderColor: "rgb(25, 118, 210)",
-    width: "50px",
     "&.Mui-selected, &.Mui-selected:hover": {
         color: "white",
         backgroundColor: "rgb(25, 118, 210)",
@@ -21,7 +20,7 @@ export const Scheduler = () => {
     const [raiseTime, setRaiseTime] = useState(dayjs("2024-04-17T"+scheduleData?.raise));
     const [lowerTime, setLowerTime] = useState(dayjs("2024-04-17T"+scheduleData?.lower));
     const [weekdays, setWeekdays] = useState(() => []);
-
+    
     useEffect(() => {
         // Trigger backend endpoint, sending http get request
         fetch("/api/setSchedule")
@@ -33,6 +32,7 @@ export const Scheduler = () => {
             })), {
                 method: 'GET'
             }
+
     }, []);
 
     const handleWeekdays = (
@@ -70,25 +70,25 @@ export const Scheduler = () => {
                     size={"small"} // make this dynamic to xs
                 >
                     <StyledButton value="Monday" aria-label="Monday">
-                        MON
+                        <Typography sx={{ fontSize: "14px" }}>MON</Typography>
                     </StyledButton>
                     <StyledButton value="Tuesday" aria-label="Tuesday">
-                        TUE
+                        <Typography sx={{ fontSize: "14px" }}>TUE</Typography>
                     </StyledButton>
                     <StyledButton value="Wednesday" aria-label="Wednesday">
-                        WED
+                        <Typography sx={{ fontSize: "14px" }}>WED</Typography>
                     </StyledButton>
                     <StyledButton value="Thursday" aria-label="Thursday">
-                        THU
+                        <Typography sx={{ fontSize: "14px" }}>THU</Typography>
                     </StyledButton>
                     <StyledButton value="Friday" aria-label="Friday">
-                        FRI
+                        <Typography sx={{ fontSize: "14px" }}>FRI</Typography>
                     </StyledButton>
                     <StyledButton value="Saturday" aria-label="Saturday">
-                        SAT
+                        <Typography sx={{ fontSize: "14px" }}>SAT</Typography>
                     </StyledButton>
                     <StyledButton value="Sunday" aria-label="Sunday">
-                        SUN
+                        <Typography sx={{ fontSize: "14px" }}>SUN</Typography>
                     </StyledButton>
                 </ToggleButtonGroup>
             </Grid2>

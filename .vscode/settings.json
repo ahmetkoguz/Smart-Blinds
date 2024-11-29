@@ -16,7 +16,9 @@
     "format": "c",
     "esp_timer.h": "c",
     "esp_http_server.h": "c",
-    "inttypes.h": "c"
+    "inttypes.h": "c",
+    "stdio.h": "c",
+    "adc.h": "c"
   },
   "idf.openOcdConfigs": [
     "board/esp32-wrover-kit-3.3v.cfg"
