@@ -5,7 +5,7 @@
 
 #define LOWER_PIN 5
 #define LOWER_ADC_THRESHOLD 4095  
-#define LOWER_MOTOR_COUNT 5
+#define LOWER_MOTOR_COUNT 13
 
 typedef struct {
     int count;
@@ -19,6 +19,8 @@ void adc_init_lower(void)
 
     // Configure ADe channel for the raise/lower operation 
     adc1_config_channel_atten(ADC1_CHANNEL_0, ADC_ATTEN_DB_12);  // Sensor PIN VP
+
+    setup_adc_timer_lower();
 }
 
 // Timer callback function for checking ADC values for the lower motor
@@ -26,18 +28,29 @@ void check_adc_lower(void *arg) {
     info_struct* info = (info_struct*)arg;
 
     int adc_value = adc1_get_raw(ADC1_CHANNEL_0);  // Read MOSFET ADC value
+
+    int lower_gpio = gpio_get_level(LOWER_PIN);
     // printf("ADC value: %d\n", adc_value);
     // printf("Count: %d, Prev: %d\n", info -> count, info -> prev_adc);
 
     if (adc_value >= LOWER_ADC_THRESHOLD && info -> prev_adc == 0) {
-        // ADC threshold exceeded, stop the lower motor
-        if(info -> count > LOWER_MOTOR_COUNT) {
-            gpio_set_level(LOWER_PIN, 0);
-            // printf("Lower motor ADC threshold exceeded. Stopping motor. ADC value: %d\n", adc_value);
+        if(lower_gpio) {
+            // ADC threshold exceeded, stop the lower motor
+            if(info -> count == LOWER_MOTOR_COUNT) {
+                gpio_set_level(LOWER_PIN, 0);
+                printf("Threshold met, stopping lower\n");
+            }
+            else {
+                info -> count += 1;
+                printf("Lower detected sensor, new count %d\n", info -> count);
+            }
         }
-
-        printf("Lower detected sensor, new count %d\n", info -> count);
-        info -> count += 1;
+        else {
+            if(info -> count != 0) {
+                info -> count -= 1;
+                printf("Lower detected sensor, new count %d\n", info -> count);
+            }
+        }
     }
 
     info -> prev_adc = adc_value;
@@ -65,7 +78,7 @@ void setup_adc_timer_lower() {
 // Initialization function for the lower motor control
 void init_lower(void) {
     esp_rom_gpio_pad_select_gpio(LOWER_PIN);
-    gpio_set_direction(LOWER_PIN, GPIO_MODE_OUTPUT);
+    gpio_set_direction(LOWER_PIN, GPIO_MODE_INPUT_OUTPUT_OD);
 
     adc_init_lower();  // Initialize the ADC
 }
@@ -90,7 +103,6 @@ esp_err_t on_lower(httpd_req_t *req) {
     bool is_on = cJSON_IsTrue(is_on_json);
     cJSON_Delete(payload);
     // Set up the periodic timer for ADC checks
-    setup_adc_timer_lower();
     toggle_lower(is_on);
     httpd_resp_set_status(req, "204 NO CONTENT");
     httpd_resp_send(req, NULL, 0);
